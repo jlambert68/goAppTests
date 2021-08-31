@@ -1,3 +1,3 @@
 package main
 
-const clientCompiledTimeStamp =  "2021-08-31 15:56:46+02:00"
+const clientCompiledTimeStamp = "2021-08-31 20:30:42+02:00"
