@@ -1,0 +1,127 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "cmd/070_AddListDelete_TestDomains/protos/api";
+
+message Instance {
+  int64 UniqueId = 1;
+  string name = 2;
+  string instance_type = 3;
+  float ecu = 4;
+  float memory = 5;
+  string network = 6;
+  string  price = 7;
+
+}
+
+message Instances {
+  repeated Instance instances = 1;
+}
+
+message SearchRequest {
+  string query = 1;
+}
+
+message TimeMessage {
+  string timeString = 1;
+}
+
+message EmptyParameter {
+}
+
+message MagicTableMetadataRequest {
+  MagicTableType MagicTableMetadataType = 1;
+}
+
+message MagicTableMetadataRespons {
+  repeated MagicTableColumnMetadata MagicTableColumnsMetadata = 1;
+  bool SearchbarIsVisible = 2;
+}
+
+message MagicTableColumnMetadata {
+  string ColumnHeaderName = 1;
+  string ColumnDataName = 2;
+  MagicTableColumnDataType ColumnDataType = 3;
+  bool Sortable = 4;
+  MagicTableColumnPresentationType FormatPresentationType = 5;
+  bool ShouldBeVisible  = 6;
+
+}
+
+enum MagicTableType {
+  TestModel = 0;
+  DomainModel = 1;
+  PluginModel = 2;
+}
+
+enum MagicTableColumnDataType {
+  String = 0;
+  Int = 1;
+  Float = 2;
+}
+
+enum MagicTableColumnPresentationType {
+  Simple = 0;
+  Sprintf = 1;
+}
+
+
+
+
+
+service Api {
+  rpc Search (SearchRequest) returns (Instances);
+  rpc GetTime (EmptyParameter) returns (TimeMessage);
+  rpc GetMagicTableMetadata(MagicTableMetadataRequest) returns (MagicTableMetadataRespons);
+  rpc ListTestDomains(EmptyParameter) returns (ListTestDomainsRespons);
+  rpc SaveNewOrUpdateTestDomain(NewOrUpdateTestDomainRequest) returns (NewOrUpdateTestDomainResponse);
+}
+
+message ListTestDomainRespons {
+  int32 Id = 1;
+  string Guid = 2;
+  string Name = 3;
+  string Description = 4;
+  bool ReadyForUse = 5;
+  bool Activated = 6;
+  bool Deleted = 7;
+  string UpdateTimestamp = 8;
+}
+
+message ListTestDomainsRespons {
+  repeated  ListTestDomainRespons MyListTestDomainsRespons = 1;
+}
+
+
+message NewOrUpdateTestDomainRequest {
+  NewOrUpdateTestDomainUpdateType NewOrUpdate = 1;
+  NewOrUpdateTestDomainData NewOrUpdateTestDomainData = 2;
+}
+
+message NewOrUpdateTestDomainData {
+  int32 Id = 1;
+  string Guid = 2;
+  string Name = 3;
+  string Description = 4;
+  bool ReadyForUse = 5;
+  bool Activated = 6;
+  bool Deleted = 7;
+  string UpdateTimestamp = 8;
+}
+
+enum NewOrUpdateTestDomainUpdateType {
+  New = 0;
+  Update = 1;
+}
+
+message NewOrUpdateTestDomainResponse {
+  int32 Id = 1;
+  string Guid = 2;
+  bool ResponseStatus = 3;
+  string ResponseMessage = 4;
+}
+
+
+
+

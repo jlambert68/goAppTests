@@ -1,0 +1,37 @@
+package server
+
+import (
+	"context"
+	"fmt"
+)
+
+func listTasks() error {
+	rows, _ := conn.Query(context.Background(), "select * from tasks")
+
+	for rows.Next() {
+		var id int32
+		var description string
+		err := rows.Scan(&id, &description)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("%d. %s\n", id, description)
+	}
+
+	return rows.Err()
+}
+
+func addTask(description string) error {
+	_, err := conn.Exec(context.Background(), "insert into tasks(description) values($1)", description)
+	return err
+}
+
+func updateTask(itemNum int32, description string) error {
+	_, err := conn.Exec(context.Background(), "update tasks set description=$1 where id=$2", description, itemNum)
+	return err
+}
+
+func removeTask(itemNum int32) error {
+	_, err := conn.Exec(context.Background(), "delete from tasks where id=$1", itemNum)
+	return err
+}

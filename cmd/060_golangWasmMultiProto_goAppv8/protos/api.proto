@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "cmd/060_golangWasmMultiProto_goAppv8/protos/api";
+
+message Instance {
+	string name = 1;
+  string instance_type = 2;
+  float ecu = 3;
+  float memory = 4;
+  string network = 5;
+  string  price = 6;
+}
+
+message Instances {
+  repeated Instance instances = 1;
+}
+
+message SearchRequest {
+  string query = 1;
+}
+
+message TimeMessage {
+  string timeString = 1;
+}
+
+message EmptyParameter {
+}
+
+
+
+service Api {
+  rpc Search (SearchRequest) returns (Instances);
+  rpc GetTime (EmptyParameter) returns (TimeMessage);
+}
+
+
