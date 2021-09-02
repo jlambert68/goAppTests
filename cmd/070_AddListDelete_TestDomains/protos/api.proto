@@ -52,7 +52,7 @@ message MagicTableColumnMetadata {
 enum MagicTableType {
   TestModel = 0;
   DomainModel = 1;
-  PluginModel = 2;
+  InstructionModel = 2;
 }
 
 enum MagicTableColumnDataType {
@@ -73,10 +73,17 @@ enum MagicTableColumnPresentationType {
 service Api {
   rpc Search (SearchRequest) returns (Instances);
   rpc GetTime (EmptyParameter) returns (TimeMessage);
+
   rpc GetMagicTableMetadata(MagicTableMetadataRequest) returns (MagicTableMetadataRespons);
+
   rpc ListTestDomains(EmptyParameter) returns (ListTestDomainsRespons);
   rpc SaveNewOrUpdateTestDomain(NewOrUpdateTestDomainRequest) returns (NewOrUpdateTestDomainResponse);
+
+  rpc ListTestInstructions(EmptyParameter) returns (ListTestInstructionsRespons);
+  rpc SaveNewOrUpdateTestInstruction(NewOrUpdateTestInstructionRequest) returns (NewOrUpdateTestInstructionResponse);
 }
+
+// TestDomains section
 
 message ListTestDomainRespons {
   int32 Id = 1;
@@ -111,11 +118,58 @@ message NewOrUpdateTestDomainData {
 }
 
 enum NewOrUpdateTestDomainUpdateType {
-  New = 0;
-  Update = 1;
+  NewTestDomain = 0;
+  UpdateTestDomain = 1;
 }
 
 message NewOrUpdateTestDomainResponse {
+  int32 Id = 1;
+  string Guid = 2;
+  bool ResponseStatus = 3;
+  string ResponseMessage = 4;
+}
+
+
+// TestInstructions section
+
+message ListTestInstructionRespons {
+  int32 Id = 1;
+  string Guid = 2;
+  string Name = 3;
+  string Description = 4;
+  bool ReadyForUse = 5;
+  bool Activated = 6;
+  bool Deleted = 7;
+  string UpdateTimestamp = 8;
+}
+
+message ListTestInstructionsRespons {
+  repeated  ListTestInstructionRespons MyListTestInstructionsRespons = 1;
+}
+
+
+message NewOrUpdateTestInstructionRequest {
+  NewOrUpdateTestInstructionUpdateType NewOrUpdate = 1;
+  NewOrUpdateTestInstructionData NewOrUpdateTestInstructionData = 2;
+}
+
+message NewOrUpdateTestInstructionData {
+  int32 Id = 1;
+  string Guid = 2;
+  string Name = 3;
+  string Description = 4;
+  bool ReadyForUse = 5;
+  bool Activated = 6;
+  bool Deleted = 7;
+  string UpdateTimestamp = 8;
+}
+
+enum NewOrUpdateTestInstructionUpdateType {
+  NewTestInstruction = 0;
+  UpdateInstruction = 1;
+}
+
+message NewOrUpdateTestInstructionResponse {
   int32 Id = 1;
   string Guid = 2;
   bool ResponseStatus = 3;

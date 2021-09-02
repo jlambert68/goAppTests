@@ -186,3 +186,75 @@ func CallApiSaveNewOrUpdateTestDomain(input NewOrUpdateTestDomainRequest) (*NewO
 
 	return &instances, nil
 }
+
+func CallApiListTestInstructions(input EmptyParameter) (*ListTestInstructionsRespons, error) {
+
+	str, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", "/api.Api/ListTestInstructions", strings.NewReader(string(str)))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	instances := ListTestInstructionsRespons{}
+	err = json.Unmarshal(body, &instances)
+	if err != nil {
+		return nil, err
+	}
+
+	return &instances, nil
+}
+
+func CallApiSaveNewOrUpdateTestInstruction(input NewOrUpdateTestInstructionRequest) (*NewOrUpdateTestInstructionResponse, error) {
+
+	str, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", "/api.Api/SaveNewOrUpdateTestInstruction", strings.NewReader(string(str)))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	instances := NewOrUpdateTestInstructionResponse{}
+	err = json.Unmarshal(body, &instances)
+	if err != nil {
+		return nil, err
+	}
+
+	return &instances, nil
+}
