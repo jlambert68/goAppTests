@@ -7,7 +7,6 @@ import (
 	"reflect"
 	"sort"
 	"strconv"
-	"time"
 )
 
 // Button Pressed
@@ -61,12 +60,14 @@ type alertMessageStruct struct {
 
 type MagicTable struct {
 	app.Compo
-	manager            *MagicManager
-	magicTableMetaData magicTableMetaDataType //[]*api.MagicTableColumnMetadata
-	instances          matgicTableDataType    // []*api.Instance
+	manager              *MagicManager
+	reloadMeaderMetaData bool
+	magicTableMetaData   magicTableMetaDataType //[]*api.MagicTableColumnMetadata
+	instances            matgicTableDataType    // []*api.Instance
 	//instancesSorted    []*api.Instance
 	//magicTableRowsData []magicTableRowStruct
 	tableType                  api.MagicTableType
+	tableTypeGuid              string
 	somethingWentWrong         bool
 	searchString               string
 	searchbarIsVisible         bool
@@ -79,7 +80,8 @@ type MagicTable struct {
 	messagesToAlertToUser      []alertMessageStruct
 	alertId                    int
 	// Field that reports whether an app update is available. False by default.
-	updateAvailable bool
+	updateAvailable              bool
+	tableTypeSelectorOptionsInDB []*api.ListTableToEdit
 }
 
 func (p *MagicTable) SetManager(manager *MagicManager) {
@@ -163,6 +165,12 @@ func (p *MagicTable) Render() app.UI {
 		}
 		p.messagesToAlertToUser = append(p.messagesToAlertToUser, messagesToAlertToUser)
 
+		// Call DB to get tableTypeSelectorOptions
+		err = p.getTableTypeSelectorOptionsFromDB()
+		if err != nil {
+			fmt.Println(err)
+		}
+
 	} //else {
 
 	//app.Window().AddEventListener("hide.bs.modal", p.onCloseModalWrapper())
@@ -170,7 +178,8 @@ func (p *MagicTable) Render() app.UI {
 	//}
 
 	// Retrieve headers metadata, if not have been done
-	if p.magicTableMetaData == nil {
+	if p.magicTableMetaData == nil || p.reloadMeaderMetaData == true {
+		p.reloadMeaderMetaData = false
 		_, p.searchbarIsVisible, err = p.updateHeaderMetaData()
 		if err != nil {
 			fmt.Println(" p.updateHeaderMetaData() generated Error:", err)
@@ -182,6 +191,61 @@ func (p *MagicTable) Render() app.UI {
 
 	// Generate test-text to see if data can be sent in to this object
 	testText := app.H1().Text(p.canBeAnyText)
+
+	// Create DropDown for choosing which table date to show/add/edit
+	var tableTypeSelectorDisabled bool
+
+	switch p.tableState {
+	case TableState_List:
+		tableTypeSelectorDisabled = false
+
+	default:
+		tableTypeSelectorDisabled = true
+	}
+
+	// Generate list of options for DropDown
+	tableTypeSelectorOptions := []app.UI{}
+	for _, tableTypeSelectorOption := range p.tableTypeSelectorOptionsInDB {
+		tempOption := app.Option().
+			Value(tableTypeSelectorOption.Guid).
+			Text(tableTypeSelectorOption.TableName)
+		tableTypeSelectorOptions = append(tableTypeSelectorOptions, tempOption)
+	}
+
+	tableTypeSelector := app.Select().
+		Class("form-select").
+		DataSet("aria-label", "Disabled select example").
+		Disabled(tableTypeSelectorDisabled).Body(
+		app.Option().
+			Text("Open this select menu").
+			Selected(true),
+		app.Range(p.tableTypeSelectorOptionsInDB).
+			Slice(func(arrayCounter int) app.UI {
+				return app.Option().
+					Value(p.tableTypeSelectorOptionsInDB[arrayCounter].Guid).
+					Text(p.tableTypeSelectorOptionsInDB[arrayCounter].TableName)
+			})).OnChange(p.MyOnChangeTableEditDropDownWrapper())
+	/*
+		app.Option().
+			Value("2").
+			Text("Two"),
+		app.Option().
+			Value("3").
+			Text("Three"))
+
+
+	*/
+
+	/*
+		<select class="form-select" aria-label="Disabled select example" disabled>
+		<option selected>Open this select menu</option>
+		<option value="1">One</option>
+		<option value="2">Two</option>
+		<option value="3">Three</option>
+		</select>
+
+
+	*/
 
 	// Create base buttons
 	baseButtons := []app.UI{}
@@ -327,7 +391,7 @@ func (p *MagicTable) Render() app.UI {
 
 		p.messagesToAlertToUser[alertMessageToUserIndex].processCount = p.messagesToAlertToUser[alertMessageToUserIndex].processCount + 1
 		showAlertClass := "show"
-		fmt.Println(alertMessageToUser.id, alertMessageToUser.show)
+		//fmt.Println(alertMessageToUser.id, alertMessageToUser.show)
 		if alertMessageToUser.show == true {
 			showAlertClass = "show"
 		} else {
@@ -352,7 +416,7 @@ func (p *MagicTable) Render() app.UI {
 
 		if alertMessageToUser.show == true {
 			alertMessages = append(alertMessages, alertMessage)
-			fmt.Println("alertMessageToUser.show == true", alertMessageToUser.id, app.Window().GetElementByID(alertMessageToUser.id).Type(), alertMessageToUser.id, app.Window().GetElementByID(alertMessageToUser.id).IsNull())
+			//fmt.Println("alertMessageToUser.show == true", alertMessageToUser.id, app.Window().GetElementByID(alertMessageToUser.id).Type(), alertMessageToUser.id, app.Window().GetElementByID(alertMessageToUser.id).IsNull())
 
 		} else {
 			alertMessages = append(alertMessages, alertMessage)
@@ -527,6 +591,9 @@ func (p *MagicTable) Render() app.UI {
 				testText,
 				openPopUp,
 				popUpp,
+				app.Div().
+					Body(
+						tableTypeSelector),
 				//app.If(p.StateCheckToShowBaseButtons() == true,
 				app.Div().
 					//Style("color", "#ff0000").
@@ -656,6 +723,17 @@ func (p *MagicTable) MyOnDblClickOnRowWrapper(rowThatWasDoubleClickedOn int) app
 			// Trigger Edit
 			p.onButtonClickWrapper(EditButton)
 		*/
+
+	}
+}
+
+func (p *MagicTable) MyOnChangeTableEditDropDownWrapper() app.EventHandler {
+	return func(ctx app.Context, e app.Event) {
+		guid := ctx.JSSrc.Get("value").String()
+		p.tableTypeGuid = guid
+
+		p.reloadMeaderMetaData = true
+		p.Update()
 
 	}
 }
@@ -927,29 +1005,34 @@ func (p *MagicTable) isButtonDisabled(buttonToEvaluate int) (buttonText string, 
 func (p *MagicTable) onRefreshButtonClickWrapper() app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 
-		alertIdStr := "alert" + strconv.Itoa(p.alertId)
-		p.alertId = p.alertId + 1
+		/*
+			alertIdStr := "alert" + strconv.Itoa(p.alertId)
+			p.alertId = p.alertId + 1
 
-		messagesToAlertToUser := alertMessageStruct{
-			id:           alertIdStr,
-			alertType:    alertType_danger,
-			alertMessage: alertIdStr + ": Detta är ett NYTT meddelande då det gick rikigt DÅLIGT!!!",
-			processCount: 0,
-			show:         true,
-		}
-		p.messagesToAlertToUser = append(p.messagesToAlertToUser, messagesToAlertToUser)
+			messagesToAlertToUser := alertMessageStruct{
+				id:           alertIdStr,
+				alertType:    alertType_danger,
+				alertMessage: alertIdStr + ": Detta är ett NYTT meddelande då det gick rikigt DÅLIGT!!!",
+				processCount: 0,
+				show:         true,
+			}
+			p.messagesToAlertToUser = append(p.messagesToAlertToUser, messagesToAlertToUser)
 
+
+		*/
 		//for _, a := range p.messagesToAlertToUser {
 		//	fmt.Println(a.id, app.Window().GetElementByID(a.id), app.Window().GetElementByID(a.id).IsNull())
 		//}
 
 		p.Update()
+		/*
+			ctx.Async(func() {
+				time.Sleep(2 * time.Second)
+				app.Window().GetElementByID("alert0button").Call("click")
+			})
 
-		ctx.Async(func() {
-			time.Sleep(2 * time.Second)
-			app.Window().GetElementByID("alert0button").Call("click")
-		})
 
+		*/
 	}
 }
 func (p *MagicTable) onCloseAlertWrapper(alertId string) app.EventHandler {
@@ -1177,6 +1260,7 @@ func (h *MagicTable) getColumnsMetadata() (magicTableMetaDataType, bool, error) 
 
 	magicTableMetadataRequest := api.MagicTableMetadataRequest{
 		MagicTableMetadataType: h.tableType,
+		TableTypeGuid:          h.tableTypeGuid,
 	}
 	magicTableMetadataRespons, err := api.CallApiGetMagicTableMetadata(magicTableMetadataRequest)
 
@@ -1222,6 +1306,21 @@ func (h *MagicTable) UpdateInstances(q string) {
 	//fmt.Println(h.magicTableRowsData)
 
 	h.Update()
+
+}
+
+// Get all tables that can be edited
+func (h *MagicTable) getTableTypeSelectorOptionsFromDB() error {
+	instances, err := api.CallApiListTablesToEdit(api.EmptyParameter{})
+
+	if err != nil {
+		fmt.Println("Search Error:", err)
+		return err
+	}
+
+	h.tableTypeSelectorOptionsInDB = instances.MyListTableToEdit
+
+	return nil
 }
 
 /*

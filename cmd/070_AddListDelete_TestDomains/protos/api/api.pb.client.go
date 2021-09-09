@@ -258,3 +258,39 @@ func CallApiSaveNewOrUpdateTestInstruction(input NewOrUpdateTestInstructionReque
 
 	return &instances, nil
 }
+
+func CallApiListTablesToEdit(input EmptyParameter) (*ListTablesToEditRespons, error) {
+
+	str, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", "/api.Api/ListTablesToEdit", strings.NewReader(string(str)))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	instances := ListTablesToEditRespons{}
+	err = json.Unmarshal(body, &instances)
+	if err != nil {
+		return nil, err
+	}
+
+	return &instances, nil
+}

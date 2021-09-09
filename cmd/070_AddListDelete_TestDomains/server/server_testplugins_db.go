@@ -9,16 +9,16 @@ func ListTestInstructionsInDB() ([]api.ListTestInstructionRespons, error) {
 	sqlToExecute := "SELECT * FROM testinstructions;"
 	rows, _ := DbPool.Query(context.Background(), sqlToExecute)
 
-	var ListTestPluginRespons api.ListTestInstructionRespons
+	var ListTestInstructionRespons api.ListTestInstructionRespons
 	var returnMessage []api.ListTestInstructionRespons
 
 	for rows.Next() {
-		err := rows.Scan(&ListTestPluginRespons.Id, &ListTestPluginRespons.Guid, &ListTestPluginRespons.Name, &ListTestPluginRespons.Description, &ListTestPluginRespons.ReadyForUse, &ListTestPluginRespons.Activated, &ListTestPluginRespons.Deleted, &ListTestPluginRespons.UpdateTimestamp)
+		err := rows.Scan(&ListTestInstructionRespons.Id, &ListTestInstructionRespons.Guid, &ListTestInstructionRespons.Name, &ListTestInstructionRespons.Description, &ListTestInstructionRespons.ReadyForUse, &ListTestInstructionRespons.Activated, &ListTestInstructionRespons.Deleted, &ListTestInstructionRespons.UpdateTimestamp)
 		if err != nil {
 			return returnMessage, err
 		}
-		returnMessage = append(returnMessage, ListTestPluginRespons)
-		//fmt.Println(ListTestPluginRespons)
+		returnMessage = append(returnMessage, ListTestInstructionRespons)
+		//fmt.Println(ListTestInstructionRespons)
 	}
 
 	return returnMessage, rows.Err()

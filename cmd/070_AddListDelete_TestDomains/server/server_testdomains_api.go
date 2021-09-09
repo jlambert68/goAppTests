@@ -87,7 +87,7 @@ func (server *Server) SaveNewOrUpdateTestDomain(ctx context.Context, in *api.New
 	err = nil
 
 	switch in.NewOrUpdate {
-	case api.NewOrUpdateTestDomainUpdateType_New:
+	case api.NewOrUpdateTestDomainUpdateType_NewTestDomain:
 		returnMessage = &api.NewOrUpdateTestDomainResponse{
 			Id:              99,
 			Guid:            "65555555",
@@ -95,7 +95,7 @@ func (server *Server) SaveNewOrUpdateTestDomain(ctx context.Context, in *api.New
 			ResponseMessage: "Message was saved in database",
 		}
 
-	case api.NewOrUpdateTestDomainUpdateType_Update:
+	case api.NewOrUpdateTestDomainUpdateType_UpdateTestDomain:
 		returnMessage = &api.NewOrUpdateTestDomainResponse{
 			Id:              in.NewOrUpdateTestDomainData.Id,
 			Guid:            in.NewOrUpdateTestDomainData.Guid,

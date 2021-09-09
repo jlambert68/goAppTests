@@ -32,6 +32,7 @@ message EmptyParameter {
 
 message MagicTableMetadataRequest {
   MagicTableType MagicTableMetadataType = 1;
+  string TableTypeGuid = 2;
 }
 
 message MagicTableMetadataRespons {
@@ -81,6 +82,8 @@ service Api {
 
   rpc ListTestInstructions(EmptyParameter) returns (ListTestInstructionsRespons);
   rpc SaveNewOrUpdateTestInstruction(NewOrUpdateTestInstructionRequest) returns (NewOrUpdateTestInstructionResponse);
+
+  rpc ListTablesToEdit(EmptyParameter) returns (ListTablesToEditRespons);
 }
 
 // TestDomains section
@@ -174,6 +177,17 @@ message NewOrUpdateTestInstructionResponse {
   string Guid = 2;
   bool ResponseStatus = 3;
   string ResponseMessage = 4;
+}
+
+// ListTableToEdit
+message ListTableToEdit {
+  int32 Id = 1;
+  string Guid = 2;
+  string TableName = 3;
+}
+
+message ListTablesToEditRespons {
+  repeated  ListTableToEdit MyListTableToEdit = 1;
 }
 
 
