@@ -12,10 +12,11 @@ var tempTimeStampAsH2__b = &TempTimeStampAsH2{myText: "Startvärde-1"}
 var tempTimeStampAsH2__c = &TempTimeStampAsH2{myText: "Startvärde-2"}
 var resultTable = &InstanceTable{}
 var magicTable = &MagicTable{
-	tableType:          api.MagicTableType_TestModel,
-	magicTableMetaData: nil,
-	columnToSortOn:     -1,
-	canBeAnyText:       "Min första text",
+	tableType: api.MagicTableType_TestModel,
+
+	//testDataAndMetaData magicTableMetaData: nil,
+	columnToSortOn: -1,
+	canBeAnyText:   "Min första text",
 }
 
 var manager = &Manager{
@@ -178,7 +179,7 @@ func (h *Manager) Search(q string) []*api.Instance {
 	})
 
 	if err != nil {
-		fmt.Println("Search Error:", err)
+		fmt.Println("SearchInDB Error:", err)
 		return []*api.Instance{}
 	}
 
@@ -203,7 +204,7 @@ func (h *searchAndResultTableType) Search(q string) []*api.Instance {
 	})
 
 	if err != nil {
-		fmt.Println("Search Error:", err)
+		fmt.Println("SearchInDB Error:", err)
 		return []*api.Instance{}
 	}
 
@@ -225,7 +226,7 @@ func (h *searchAndResultTableType) GetTime() string {
 var tempInstances []*api.Instance
 
 func (h *Manager) UpdateInstances(q string) {
-	fmt.Println("func (h *Manager) UpdateInstances(q string) { " + q)
+	fmt.Println("func (h *Manager) RetrieveTableDataFromDB(q string) { " + q)
 	instances := h.Search(q)
 	tempInstances = instances
 	fmt.Println("qqqqqqqqqqqqqqqqqqqqqq")
@@ -256,7 +257,7 @@ func (h *Manager) UpdateInstances(q string) {
 }
 
 func (h *MyManager) UpdateInstances(q string) {
-	fmt.Println("func (h *Manager) UpdateInstances(q string) { " + q)
+	fmt.Println("func (h *Manager) RetrieveTableDataFromDB(q string) { " + q)
 	instances := searchAndResultTable.Search(q)
 	tempInstances = instances
 	fmt.Println("qqqqqqqqqqqqqqqqqqqqqq")

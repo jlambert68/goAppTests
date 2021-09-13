@@ -236,7 +236,7 @@ func NewApiClient(cc grpc.ClientConnInterface) ApiClient {
 
 func (c *apiClient) Search(ctx context.Context, in *SearchRequest, opts ...grpc.CallOption) (*Instances, error) {
 	out := new(Instances)
-	err := c.cc.Invoke(ctx, "/api.Api/Search", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/api.Api/SearchInDB", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -253,7 +253,7 @@ type UnimplementedApiServer struct {
 }
 
 func (*UnimplementedApiServer) Search(ctx context.Context, req *SearchRequest) (*Instances, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Search not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method SearchInDB not implemented")
 }
 
 func RegisterApiServer(s *grpc.Server, srv ApiServer) {
@@ -270,7 +270,7 @@ func _Api_Search_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.Api/Search",
+		FullMethod: "/api.Api/SearchInDB",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ApiServer).Search(ctx, req.(*SearchRequest))
@@ -283,7 +283,7 @@ var _Api_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*ApiServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Search",
+			MethodName: "SearchInDB",
 			Handler:    _Api_Search_Handler,
 		},
 	},

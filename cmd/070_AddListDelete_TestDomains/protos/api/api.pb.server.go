@@ -9,7 +9,7 @@ import (
 
 func RegisterApiHTTPMux(mux *http.ServeMux, srv ApiServer) {
 
-	mux.HandleFunc("/api.Api/Search", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api.Api/SearchInDB", func(w http.ResponseWriter, r *http.Request) {
 		in := new(SearchRequest)
 		inJSON, err := ioutil.ReadAll(r.Body)
 		defer r.Body.Close()

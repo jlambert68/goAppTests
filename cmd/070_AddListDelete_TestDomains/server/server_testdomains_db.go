@@ -5,20 +5,20 @@ import (
 	"goAppTest1/cmd/070_AddListDelete_TestDomains/protos/api"
 )
 
-func ListTestDomainsInDB() ([]api.ListTestDomainRespons, error) {
+func ListTestDomainsInDB() ([]api.TestDomainForListingMessage, error) {
 	sqlToExecute := "SELECT * FROM testdomains;"
 	rows, _ := DbPool.Query(context.Background(), sqlToExecute)
 
-	var ListTestDomainRespons api.ListTestDomainRespons
-	var returnMessage []api.ListTestDomainRespons
+	var testDomainForListingMessage api.TestDomainForListingMessage
+	var returnMessage []api.TestDomainForListingMessage
 
 	for rows.Next() {
-		err := rows.Scan(&ListTestDomainRespons.Id, &ListTestDomainRespons.Guid, &ListTestDomainRespons.Name, &ListTestDomainRespons.Description, &ListTestDomainRespons.ReadyForUse, &ListTestDomainRespons.Activated, &ListTestDomainRespons.Deleted, &ListTestDomainRespons.UpdateTimestamp)
+		err := rows.Scan(&testDomainForListingMessage.Id, &testDomainForListingMessage.Guid, &testDomainForListingMessage.Name, &testDomainForListingMessage.Description, &testDomainForListingMessage.ReadyForUse, &testDomainForListingMessage.Activated, &testDomainForListingMessage.Deleted, &testDomainForListingMessage.UpdateTimestamp)
 		if err != nil {
 			return returnMessage, err
 		}
-		returnMessage = append(returnMessage, ListTestDomainRespons)
-		//fmt.Println(ListTestDomainRespons)
+		returnMessage = append(returnMessage, testDomainForListingMessage)
+
 	}
 
 	return returnMessage, rows.Err()

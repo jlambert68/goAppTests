@@ -88,7 +88,7 @@ service Api {
 
 // TestDomains section
 
-message ListTestDomainRespons {
+message testDomainForListingMessage {
   int32 Id = 1;
   string Guid = 2;
   string Name = 3;
@@ -100,7 +100,7 @@ message ListTestDomainRespons {
 }
 
 message ListTestDomainsRespons {
-  repeated  ListTestDomainRespons MyListTestDomainsRespons = 1;
+  repeated  testDomainForListingMessage testDomainForListing = 1;
 }
 
 

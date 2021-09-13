@@ -45,7 +45,7 @@ func (h *Manager) Search(q string) []*api.Instance {
 	})
 
 	if err != nil {
-		fmt.Println("Search Error:", err)
+		fmt.Println("SearchInDB Error:", err)
 		return []*api.Instance{}
 	}
 

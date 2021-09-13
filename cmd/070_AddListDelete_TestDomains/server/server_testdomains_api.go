@@ -9,7 +9,7 @@ import (
 func (server *Server) ListTestDomains(ctx context.Context, in *api.EmptyParameter) (*api.ListTestDomainsRespons, error) {
 
 	var testDomainsRespons *api.ListTestDomainsRespons
-	var myListTestDomainsRespons []*api.ListTestDomainRespons
+	var testDomainForListingMessages []*api.TestDomainForListingMessage
 
 	testDomainsFromDB, err := ListTestDomainsInDB()
 	if err != nil {
@@ -21,7 +21,7 @@ func (server *Server) ListTestDomains(ctx context.Context, in *api.EmptyParamete
 
 	for _, testDomainFromDB := range testDomainsFromDB {
 
-		testDomain := &api.ListTestDomainRespons{
+		testDomain := &api.TestDomainForListingMessage{
 			Id:              testDomainFromDB.Id,
 			Guid:            testDomainFromDB.Guid,
 			Name:            testDomainFromDB.Name,
@@ -32,12 +32,12 @@ func (server *Server) ListTestDomains(ctx context.Context, in *api.EmptyParamete
 			UpdateTimestamp: testDomainFromDB.UpdateTimestamp,
 		}
 
-		myListTestDomainsRespons = append(myListTestDomainsRespons, testDomain)
+		testDomainForListingMessages = append(testDomainForListingMessages, testDomain)
 
 	}
 
 	testDomainsRespons = &api.ListTestDomainsRespons{
-		MyListTestDomainsRespons: myListTestDomainsRespons,
+		TestDomainForListing: testDomainForListingMessages,
 	}
 
 	return testDomainsRespons, nil
