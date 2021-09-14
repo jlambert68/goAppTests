@@ -2,28 +2,40 @@ package main
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"goAppTest1/cmd/070_AddListDelete_TestDomains/protos/api"
 )
 
-func (h *MagicTable) RetrieveTableDataFromDB(q string) {
+func (mt *MagicTable) RetrieveTableDataFromDB(q string) {
 
 	// Unselect rows
-	h.rowSelected = -1
+	mt.rowSelected = -1
 
-	h.SearchInDB(q)
-	//instances := h.SearchInDB(q)
-	//h.testDataAndMetaData.originalTestdataInstances = instances
+	mt.SearchInDB(q)
+	//instances := mt.SearchInDB(q)
+	//mt.testDataAndMetaData.originalTestdataInstances = instances
 
-	//h.convertInstancesIntoStandardMagicTable()
-	//fmt.Println(h.magicTableRowsData)
+	//mt.convertInstancesIntoStandardMagicTable()
+	//fmt.Println(mt.magicTableRowsData)
 
-	h.Update()
+	mt.Update()
 
 }
 
-func (h *MagicTable) SearchInDB(q string) {
+func (mt *MagicTable) SearchInDB(q string) {
+
+	mt.logger.WithFields(logrus.Fields{
+		"Id": "843892ce-d69f-407d-8436-af2f6307b9c6",
+	}).Debug("Entering: SearchInDB()")
+
+	defer func() {
+		mt.logger.WithFields(logrus.Fields{
+			"Id": "19b11793-4986-4c5e-825c-0bf0755dcbd9",
+		}).Debug("Exiting: SearchInDB()")
+	}()
+
 	//var err error
-	switch h.tableTypeGuid {
+	switch mt.tableTypeGuid {
 
 	// Original Test table
 	case "51253aba-41a9-42ef-b5f1-d8d1d7116b47":
@@ -33,11 +45,11 @@ func (h *MagicTable) SearchInDB(q string) {
 
 		if err != nil {
 			fmt.Println("SearchInDB Error:", err)
-			h.testDataAndMetaData.originalTestdataInstances = originalTestdataInstancesType{}
+			mt.testDataAndMetaData.originalTestdataInstances = originalTestdataInstancesType{}
 			return
 		}
 
-		h.testDataAndMetaData.originalTestdataInstances = originalInstances.Instances
+		mt.testDataAndMetaData.originalTestdataInstances = originalInstances.Instances
 		return
 
 		// TestDomains
@@ -46,11 +58,11 @@ func (h *MagicTable) SearchInDB(q string) {
 
 		if err != nil {
 			fmt.Println("SearchInDB Error:", err)
-			h.testDataAndMetaData.testDomains = testDomainsType{}
+			mt.testDataAndMetaData.testDomains = testDomainsType{}
 			return
 		}
 
-		h.testDataAndMetaData.testDomains = testDomainInstances.TestDomainForListing
+		mt.testDataAndMetaData.testDomains = testDomainInstances.TestDomainForListing
 		return
 
 	// TestInstructions
@@ -59,16 +71,16 @@ func (h *MagicTable) SearchInDB(q string) {
 
 		if err != nil {
 			fmt.Println("SearchInDB Error:", err)
-			h.testDataAndMetaData.testInstructions = testInstructionsType{}
+			mt.testDataAndMetaData.testInstructions = testInstructionsType{}
 			return
 		}
 
-		h.testDataAndMetaData.testInstructions = testInstructionsInstances.MyListTestInstructionsRespons
+		mt.testDataAndMetaData.testInstructions = testInstructionsInstances.MyListTestInstructionsRespons
 		return
 
 		// Unknow Table type
 	default:
-		fmt.Println("Unknow table type: ", h.tableTypeGuid)
+		fmt.Println("Unknown table type2: ", mt.tableTypeGuid)
 		return
 	}
 

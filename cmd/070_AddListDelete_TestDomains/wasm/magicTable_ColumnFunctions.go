@@ -9,11 +9,11 @@ import (
 	"strconv"
 )
 
-func (p *MagicTable) MyOnColumnClickWrapper(columnNumberThatWasClicked int) app.EventHandler {
+func (mt *MagicTable) MyOnColumnClickWrapper(columnNumberThatWasClicked int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 
 		// Only allow click if Table state is in 'List'
-		if p.tableState != TableState_List {
+		if mt.tableState != TableState_List {
 			return
 		}
 
@@ -21,86 +21,86 @@ func (p *MagicTable) MyOnColumnClickWrapper(columnNumberThatWasClicked int) app.
 		fmt.Println("")
 
 		// Only sort if column is sortable
-		if p.testDataAndMetaData.magicTableMetaData[columnNumberThatWasClicked].Sortable == true {
+		if mt.testDataAndMetaData.magicTableMetaData[columnNumberThatWasClicked].Sortable == true {
 
 			// Check if table for sorted before
 			if firstTimeForSorting == true {
 				firstTimeForSorting = false
 
 				// First time
-				p.columnToSortOn = columnNumberThatWasClicked
-				p.columnSortOrderIsAscending = true
+				mt.columnToSortOn = columnNumberThatWasClicked
+				mt.columnSortOrderIsAscending = true
 
 				// Not the first time
 			} else {
 				// If the same column was clicked then invert sort order for column
-				if p.columnToSortOn == columnNumberThatWasClicked {
-					p.columnSortOrderIsAscending = !p.columnSortOrderIsAscending
+				if mt.columnToSortOn == columnNumberThatWasClicked {
+					mt.columnSortOrderIsAscending = !mt.columnSortOrderIsAscending
 				} else {
 					// New column to sort on
-					p.columnToSortOn = columnNumberThatWasClicked
-					p.columnSortOrderIsAscending = true
+					mt.columnToSortOn = columnNumberThatWasClicked
+					mt.columnSortOrderIsAscending = true
 				}
 			}
 
 			var compareResult bool
 			// Sort by age, keeping original order or equal elements.
-			sort.SliceStable(p.testDataAndMetaData.originalTestdataInstances, func(i, j int) bool {
+			sort.SliceStable(mt.testDataAndMetaData.originalTestdataInstances, func(i, j int) bool {
 
 				// General solution - Nice
 				if true {
-					fieldsToExtract := p.testDataAndMetaData.magicTableMetaData[columnNumberThatWasClicked].GetColumnDataName()
+					fieldsToExtract := mt.testDataAndMetaData.magicTableMetaData[columnNumberThatWasClicked].GetColumnDataName()
 					//fmt.Println("fieldsToExtract", fieldsToExtract)
-					value1 := getAttr(p.testDataAndMetaData.originalTestdataInstances[i], fieldsToExtract)
-					value2 := getAttr(p.testDataAndMetaData.originalTestdataInstances[j], fieldsToExtract)
+					value1 := getAttr(mt.testDataAndMetaData.originalTestdataInstances[i], fieldsToExtract)
+					value2 := getAttr(mt.testDataAndMetaData.originalTestdataInstances[j], fieldsToExtract)
 
-					switch p.testDataAndMetaData.magicTableMetaData[columnNumberThatWasClicked].ColumnDataType {
+					switch mt.testDataAndMetaData.magicTableMetaData[columnNumberThatWasClicked].ColumnDataType {
 					case api.MagicTableColumnDataType_String:
 						compareResult = value1.String() < value2.String()
 					case api.MagicTableColumnDataType_Float:
 						compareResult = value1.Float() < value2.Float()
 					}
 
-					return xnor(p.columnSortOrderIsAscending, compareResult)
+					return xnor(mt.columnSortOrderIsAscending, compareResult)
 
 				} else {
 					// Hard defined sorting-types - Should be removed
-					switch p.columnToSortOn {
+					switch mt.columnToSortOn {
 					case 0:
-						return xnor(p.columnSortOrderIsAscending, p.testDataAndMetaData.originalTestdataInstances[i].Name < p.testDataAndMetaData.originalTestdataInstances[j].Name)
+						return xnor(mt.columnSortOrderIsAscending, mt.testDataAndMetaData.originalTestdataInstances[i].Name < mt.testDataAndMetaData.originalTestdataInstances[j].Name)
 
 					case 1:
-						return xnor(p.columnSortOrderIsAscending, p.testDataAndMetaData.originalTestdataInstances[i].InstanceType < p.testDataAndMetaData.originalTestdataInstances[j].InstanceType)
+						return xnor(mt.columnSortOrderIsAscending, mt.testDataAndMetaData.originalTestdataInstances[i].InstanceType < mt.testDataAndMetaData.originalTestdataInstances[j].InstanceType)
 
 					case 2:
-						return xnor(p.columnSortOrderIsAscending, p.testDataAndMetaData.originalTestdataInstances[i].Ecu < p.testDataAndMetaData.originalTestdataInstances[j].Ecu)
+						return xnor(mt.columnSortOrderIsAscending, mt.testDataAndMetaData.originalTestdataInstances[i].Ecu < mt.testDataAndMetaData.originalTestdataInstances[j].Ecu)
 
 					case 3:
-						return xnor(p.columnSortOrderIsAscending, p.testDataAndMetaData.originalTestdataInstances[i].Memory < p.testDataAndMetaData.originalTestdataInstances[j].Memory)
+						return xnor(mt.columnSortOrderIsAscending, mt.testDataAndMetaData.originalTestdataInstances[i].Memory < mt.testDataAndMetaData.originalTestdataInstances[j].Memory)
 
 					case 4:
-						return xnor(p.columnSortOrderIsAscending, p.testDataAndMetaData.originalTestdataInstances[i].Network < p.testDataAndMetaData.originalTestdataInstances[j].Network)
+						return xnor(mt.columnSortOrderIsAscending, mt.testDataAndMetaData.originalTestdataInstances[i].Network < mt.testDataAndMetaData.originalTestdataInstances[j].Network)
 
 					case 5:
-						return xnor(p.columnSortOrderIsAscending, p.testDataAndMetaData.originalTestdataInstances[i].Price < p.testDataAndMetaData.originalTestdataInstances[j].Price)
+						return xnor(mt.columnSortOrderIsAscending, mt.testDataAndMetaData.originalTestdataInstances[i].Price < mt.testDataAndMetaData.originalTestdataInstances[j].Price)
 
 					default:
 						fmt.Println("Could not sort on column: " + strconv.Itoa(columnNumberThatWasClicked))
 						fmt.Println("Will sort on Name-ascending, instead: ")
-						return xnor(true, p.testDataAndMetaData.originalTestdataInstances[i].Name < p.testDataAndMetaData.originalTestdataInstances[j].Name)
+						return xnor(true, mt.testDataAndMetaData.originalTestdataInstances[i].Name < mt.testDataAndMetaData.originalTestdataInstances[j].Name)
 					}
 				}
 
 			})
-			p.Update()
+			mt.Update()
 			//magicManager.Update()
 
 			// Update selected row
-			for rowCounter, i := range p.testDataAndMetaData.originalTestdataInstances {
+			for rowCounter, i := range mt.testDataAndMetaData.originalTestdataInstances {
 
 				// Check if selected row
-				if i.UniqueId == p.uniqueRowSelected {
-					p.rowSelected = rowCounter
+				if i.UniqueId == mt.uniqueRowSelected {
+					mt.rowSelected = int64(rowCounter)
 				}
 			}
 

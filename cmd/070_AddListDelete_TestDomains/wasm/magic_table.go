@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/maxence-charriere/go-app/v8/pkg/app"
+	"github.com/sirupsen/logrus"
 	"goAppTest1/cmd/070_AddListDelete_TestDomains/protos/api"
 	"reflect"
 	"strconv"
@@ -75,6 +76,7 @@ type alertMessageStruct struct {
 }
 
 type MagicTable struct {
+	logger *logrus.Logger
 	app.Compo
 	manager              *MagicManager
 	reloadHeaderMetaData bool
@@ -93,7 +95,7 @@ type MagicTable struct {
 	columnSortOrderIsAscending bool
 	canBeAnyText               string
 	tableState                 int
-	rowSelected                int
+	rowSelected                int64
 	uniqueRowSelected          int64
 	messagesToAlertToUser      []alertMessageStruct
 	alertId                    int
@@ -108,50 +110,57 @@ type MagicTable struct {
 	tableColumnNodes []app.UI
 }
 
-func (p *MagicTable) SetManager(manager *MagicManager) {
-	p.manager = manager
+func (mt *MagicTable) SetManager(manager *MagicManager) {
+	mt.manager = manager
 }
 
-func (p *MagicTable) SetCanbeAnyText(canBeAnyText string) {
-	p.canBeAnyText = canBeAnyText
+func (mt *MagicTable) SetCanbeAnyText(canBeAnyText string) {
+	mt.canBeAnyText = canBeAnyText
 }
 
-func (p *MagicTable) updateHeaderMetaData() (magicTableMetaDataType, bool, error) {
-	columnMeta, searchbarIsVisible, err := p.getColumnsMetadata()
+func (mt *MagicTable) updateHeaderMetaData() (magicTableMetaDataType, bool, error) {
+	columnMeta, searchbarIsVisible, err := mt.getColumnsMetadata()
+
 	return columnMeta, searchbarIsVisible, err
 }
 
 // OnAppUpdate satisfies the app.Updater interface. It is called when the app is
 // updated in background.
-func (p *MagicTable) OnAppUpdate(ctx app.Context) {
-	p.updateAvailable = ctx.AppUpdateAvailable // Reports that an app update is available.
-	p.Update()                                 // Triggers UI update.
+func (mt *MagicTable) OnAppUpdate(ctx app.Context) {
+	mt.updateAvailable = ctx.AppUpdateAvailable // Reports that an app update is available.
+	mt.Update()                                 // Triggers UI update.
 }
 
-func (p *MagicTable) Render() app.UI {
+func (mt *MagicTable) Render() app.UI {
 
 	var err error
 	//var searchInput app.HTMLDiv
 
 	if firstSearch == true {
 
+		// Initiate logrus logger
+		mt.InitLogger("")
+
+		// Only for testing
+		mt.tableTypeGuid = "51253aba-41a9-42ef-b5f1-d8d1d7116b47"
+
 		// No row is selected
-		p.rowSelected = -1
-		p.uniqueRowSelected = -1
+		mt.rowSelected = -1
+		mt.uniqueRowSelected = -1
 
 		// Set Table State
-		p.tableState = TableState_List
+		mt.tableState = TableState_List
 
-		p.RetrieveTableDataFromDB("")
+		mt.RetrieveTableDataFromDB("")
 		firstSearch = false
 
 		// Try to update manager-ref
 		magicManager.magicTable.SetManager(magicManager)
 
-		app.Window().AddEventListener("hide.bs.modal", p.onCloseModalWrapper())
-		//app.Window().AddEventListener("closed.bs.alert", p.onCloseAlertWrapper())
+		app.Window().AddEventListener("hide.bs.modal", mt.onCloseModalWrapper())
+		//app.Window().AddEventListener("closed.bs.alert", mt.onCloseAlertWrapper())
 
-		p.alertId = 4
+		mt.alertId = 4
 
 		messagesToAlertToUser := alertMessageStruct{
 			id:           "alert0",
@@ -160,7 +169,7 @@ func (p *MagicTable) Render() app.UI {
 			processCount: 0,
 			show:         true,
 		}
-		p.messagesToAlertToUser = append(p.messagesToAlertToUser, messagesToAlertToUser)
+		mt.messagesToAlertToUser = append(mt.messagesToAlertToUser, messagesToAlertToUser)
 
 		messagesToAlertToUser = alertMessageStruct{
 			id:           "alert1",
@@ -169,7 +178,7 @@ func (p *MagicTable) Render() app.UI {
 			processCount: 0,
 			show:         true,
 		}
-		p.messagesToAlertToUser = append(p.messagesToAlertToUser, messagesToAlertToUser)
+		mt.messagesToAlertToUser = append(mt.messagesToAlertToUser, messagesToAlertToUser)
 
 		messagesToAlertToUser = alertMessageStruct{
 			id:           "alert2",
@@ -178,7 +187,7 @@ func (p *MagicTable) Render() app.UI {
 			processCount: 0,
 			show:         true,
 		}
-		p.messagesToAlertToUser = append(p.messagesToAlertToUser, messagesToAlertToUser)
+		mt.messagesToAlertToUser = append(mt.messagesToAlertToUser, messagesToAlertToUser)
 
 		messagesToAlertToUser = alertMessageStruct{
 			id:           "alert3",
@@ -187,36 +196,37 @@ func (p *MagicTable) Render() app.UI {
 			processCount: 0,
 			show:         true,
 		}
-		p.messagesToAlertToUser = append(p.messagesToAlertToUser, messagesToAlertToUser)
+		mt.messagesToAlertToUser = append(mt.messagesToAlertToUser, messagesToAlertToUser)
 
 		// Call DB to get tableTypeSelectorOptions
-		err = p.getTableTypeSelectorOptionsFromDB()
+		err = mt.getTableTypeSelectorOptionsFromDB()
 		if err != nil {
 			fmt.Println(err)
 		}
 
 	} //else {
 
-	//app.Window().AddEventListener("hide.bs.modal", p.onCloseModalWrapper())
+	//app.Window().AddEventListener("hide.bs.modal", mt.onCloseModalWrapper())
 
 	//}
 
 	// Retrieve headers metadata, if not have been done
-	if p.testDataAndMetaData.magicTableMetaData == nil || p.reloadHeaderMetaData == true {
-		p.reloadHeaderMetaData = false
-		_, p.searchbarIsVisible, err = p.updateHeaderMetaData()
+	if (mt.testDataAndMetaData.magicTableMetaData == nil || mt.reloadHeaderMetaData == true) && len(mt.tableTypeGuid) > 0 {
+		mt.reloadHeaderMetaData = false
+		_, mt.searchbarIsVisible, err = mt.updateHeaderMetaData()
 		if err != nil {
-			fmt.Println(" p.updateHeaderMetaData() generated Error:", err)
+			fmt.Println(" mt.updateHeaderMetaData() generated Error:", err)
 
 			// If something went wrong, return a message instead
 			return app.H1().Text("Couldn't Retrieve Magic table Header Metadata")
 		}
+
 	}
 
-	//p.messagesToAlertToUser = nil
-	//fmt.Println("Antal Alerts2: " + strconv.Itoa(len(p.messagesToAlertToUser)))
+	//mt.messagesToAlertToUser = nil
+	//fmt.Println("Antal Alerts2: " + strconv.Itoa(len(mt.messagesToAlertToUser)))
 
-	magicTableRenderedObject, err := p.AssembleMagicalTableObject()
+	magicTableRenderedObject, err := mt.AssembleMagicalTableObject()
 	if err != nil {
 		fmt.Println("Problem assemble the magicTable page object")
 	}
@@ -225,22 +235,22 @@ func (p *MagicTable) Render() app.UI {
 
 }
 
-func (p *MagicTable) removeIndexFromMagicTable(s []alertMessageStruct, index int) []alertMessageStruct {
+func (mt *MagicTable) removeIndexFromMagicTable(s []alertMessageStruct, index int) []alertMessageStruct {
 	return append(s[:index], s[index+1:]...)
 }
 
-func (p *MagicTable) GetRowTextBoxValueForEdit(columnDataName string) string {
+func (mt *MagicTable) GetRowTextBoxValueForEdit(columnDataName string) string {
 
 	var returnValue string
 
-	switch p.tableState {
+	switch mt.tableState {
 
 	case TableState_New:
 		returnValue = ""
 
 	case TableState_Edit,
 		TableState_Delete:
-		rowData := p.testDataAndMetaData.originalTestdataInstances[p.rowSelected]
+		rowData := mt.testDataAndMetaData.originalTestdataInstances[mt.rowSelected]
 		//returnValue =rowData.GetName()
 
 		r := reflect.ValueOf(rowData)
@@ -255,8 +265,8 @@ func (p *MagicTable) GetRowTextBoxValueForEdit(columnDataName string) string {
 	return returnValue
 }
 
-func (p *MagicTable) StateCheckToShowBaseButtons() bool {
-	switch p.tableState {
+func (mt *MagicTable) StateCheckToShowBaseButtons() bool {
+	switch mt.tableState {
 	case
 		TableState_Search_Load,
 		TableState_List:
@@ -265,16 +275,16 @@ func (p *MagicTable) StateCheckToShowBaseButtons() bool {
 	return false
 }
 
-func (p *MagicTable) SetSortIconForTableHeader(columnCounter int) string {
+func (mt *MagicTable) SetSortIconForTableHeader(columnCounter int) string {
 	var returnMessage string
-	//fmt.Println("p.columnToSortOn: ", p.columnToSortOn, p.testDataAndMetaData.magicTableMetaData[columnCounter].String(), p.testDataAndMetaData.magicTableMetaData[columnCounter].Sortable)
+	//fmt.Println("mt.columnToSortOn: ", mt.columnToSortOn, mt.testDataAndMetaData.magicTableMetaData[columnCounter].String(), mt.testDataAndMetaData.magicTableMetaData[columnCounter].Sortable)
 
 	// Only Set icon on correct Header
 
-	if p.testDataAndMetaData.magicTableMetaData[columnCounter].Sortable == true {
+	if mt.testDataAndMetaData.magicTableMetaData[columnCounter].Sortable == true {
 		// Column is sortable
-		if columnCounter == p.columnToSortOn && firstTimeForSorting == false {
-			if p.columnSortOrderIsAscending {
+		if columnCounter == mt.columnToSortOn && firstTimeForSorting == false {
+			if mt.columnSortOrderIsAscending {
 				returnMessage = "↑"
 			} else {
 				returnMessage = "↓"
@@ -291,83 +301,71 @@ func (p *MagicTable) SetSortIconForTableHeader(columnCounter int) string {
 	return returnMessage
 }
 
-func (p *MagicTable) formatColumnData(v *api.Instance, field string) string {
-
-	var returnValue string
-
-	r := reflect.ValueOf(v)
-	f := reflect.Indirect(r).FieldByName(field)
-
-	returnValue = fmt.Sprintf("%v", f)
-
-	return returnValue
-}
-
 //func (p *InstanceTable)  onClick(ctx app.Context, e app.Event) {
 //	fmt.Println("onClick is called")
 //}
-func (p *MagicTable) MyOnDblClickOnRowWrapper(rowThatWasDoubleClickedOn int) app.EventHandler {
+func (mt *MagicTable) MyOnDblClickOnRowWrapper(rowThatWasDoubleClickedOn int64) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
-		p.MyOnDblClickOnRow(rowThatWasDoubleClickedOn)
+		mt.MyOnDblClickOnRow(rowThatWasDoubleClickedOn)
 
 		/*
 			// Only allow click if Table state is in 'List'
-			if  p.tableState != TableState_List {
+			if  mt.tableState != TableState_List {
 				return
 			}
 
 
 			fmt.Println("OnDblClick is called::::::" + strconv.Itoa(rowThatWasDoubleClickedOn))
-			rowData := p.testDataAndMetaData.originalTestdataInstances[rowThatWasDoubleClickedOn]
+			rowData := mt.testDataAndMetaData.originalTestdataInstances[rowThatWasDoubleClickedOn]
 			fmt.Println("RowData: " + rowData.String())
 			fmt.Println("")
 
 
 			// Trigger Edit
-			p.onButtonClickWrapper(EditButton)
+			mt.onButtonClickWrapper(EditButton)
 		*/
 
 	}
 }
 
-func (p *MagicTable) MyOnDblClickOnRow(rowThatWasDoubleClickedOn int) {
+func (mt *MagicTable) MyOnDblClickOnRow(rowThatWasDoubleClickedOn int64) {
 	// Only allow click if Table state is in 'List'
-	if p.tableState != TableState_List {
+	if mt.tableState != TableState_List {
 		return
 	}
 
-	fmt.Println("OnDblClick is called::::::" + strconv.Itoa(rowThatWasDoubleClickedOn))
-	rowData := p.testDataAndMetaData.originalTestdataInstances[rowThatWasDoubleClickedOn]
+	fmt.Println("OnDblClick is called::::::" + strconv.FormatInt(rowThatWasDoubleClickedOn, 10))
+	rowData := mt.testDataAndMetaData.originalTestdataInstances[rowThatWasDoubleClickedOn]
 	fmt.Println("RowData: " + rowData.String())
 	fmt.Println("")
 
 	// Trigger Edit
-	p.onButtonClick(EditButton)
+	mt.onButtonClick(EditButton)
 }
 
-func (p *MagicTable) MyOnClickOnRowWrapper(rowThatWasClickedOn int) app.EventHandler {
+func (mt *MagicTable) MyOnClickOnRowWrapper(rowThatWasClickedOn int64) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 
 		// Only allow click if Table state is in 'List'
-		if p.tableState != TableState_List {
+		if mt.tableState != TableState_List {
 			return
 		}
 
-		fmt.Println("OnClick is called::::::" + strconv.Itoa(rowThatWasClickedOn))
-		rowData := p.testDataAndMetaData.originalTestdataInstances[rowThatWasClickedOn]
+		fmt.Println("OnClick is called::::::" + strconv.FormatInt(rowThatWasClickedOn, 10))
+		rowData := mt.testDataAndMetaData.originalTestdataInstances[rowThatWasClickedOn]
 		fmt.Println("RowData: " + rowData.String())
 		fmt.Println("")
 
-		p.rowSelected = rowThatWasClickedOn
-		p.uniqueRowSelected = rowData.GetUniqueId()
-		p.Update()
+		mt.rowSelected = rowThatWasClickedOn
+		mt.uniqueRowSelected = rowData.GetUniqueId()
+		mt.Update()
 	}
 }
 
-func (p *MagicTable) OnDblClickapp(src app.Value, e app.Event) {
+func (mt *MagicTable) OnDblClickapp(src app.Value, e app.Event) {
 
 	// Only allow click if Table state is in 'List'
-	if p.tableState != TableState_List {
+	if mt.tableState != TableState_List {
 		return
 	}
 	fmt.Println("OnDblClick is called - 1025")
@@ -376,7 +374,7 @@ func (p *MagicTable) OnDblClickapp(src app.Value, e app.Event) {
 
 }
 
-func (p *MagicTable) OnTextboxDblClickappWrapper(buttonId string) app.EventHandler {
+func (mt *MagicTable) OnTextboxDblClickappWrapper(buttonId string) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 
 		elem := app.Window().GetElementByID(buttonId)
@@ -386,9 +384,9 @@ func (p *MagicTable) OnTextboxDblClickappWrapper(buttonId string) app.EventHandl
 	}
 }
 
-func (p *MagicTable) areNewUpdateDeleteTextBoxesDisabled() (textBoxesAreEnabled bool) {
+func (mt *MagicTable) areNewUpdateDeleteTextBoxesDisabled() (textBoxesAreEnabled bool) {
 
-	switch p.tableState {
+	switch mt.tableState {
 	case TableState_New,
 		TableState_Edit:
 		textBoxesAreEnabled = false
@@ -402,12 +400,12 @@ func (p *MagicTable) areNewUpdateDeleteTextBoxesDisabled() (textBoxesAreEnabled 
 
 }
 
-func (p *MagicTable) onRefreshButtonClickWrapper() app.EventHandler {
+func (mt *MagicTable) onRefreshButtonClickWrapper() app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 
 		/*
-			alertIdStr := "alert" + strconv.Itoa(p.alertId)
-			p.alertId = p.alertId + 1
+			alertIdStr := "alert" + strconv.Itoa(mt.alertId)
+			mt.alertId = mt.alertId + 1
 
 			messagesToAlertToUser := alertMessageStruct{
 				id:           alertIdStr,
@@ -416,15 +414,15 @@ func (p *MagicTable) onRefreshButtonClickWrapper() app.EventHandler {
 				processCount: 0,
 				show:         true,
 			}
-			p.messagesToAlertToUser = append(p.messagesToAlertToUser, messagesToAlertToUser)
+			mt.messagesToAlertToUser = append(mt.messagesToAlertToUser, messagesToAlertToUser)
 
 
 		*/
-		//for _, a := range p.messagesToAlertToUser {
+		//for _, a := range mt.messagesToAlertToUser {
 		//	fmt.Println(a.id, app.Window().GetElementByID(a.id), app.Window().GetElementByID(a.id).IsNull())
 		//}
 
-		p.Update()
+		mt.Update()
 		/*
 			ctx.Async(func() {
 				time.Sleep(2 * time.Second)
@@ -435,20 +433,20 @@ func (p *MagicTable) onRefreshButtonClickWrapper() app.EventHandler {
 		*/
 	}
 }
-func (p *MagicTable) onCloseAlertWrapper(alertId string) app.EventHandler {
+func (mt *MagicTable) onCloseAlertWrapper(alertId string) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 		fmt.Println("***Alert-box (" + alertId + ") stängdes av användaren***")
 		//app.Window().Call("hideAlert", alertId)
-		for alertCounter, _ := range p.messagesToAlertToUser {
-			if p.messagesToAlertToUser[alertCounter].id == alertId {
+		for alertCounter, _ := range mt.messagesToAlertToUser {
+			if mt.messagesToAlertToUser[alertCounter].id == alertId {
 				fmt.Println("hittade")
-				p.messagesToAlertToUser[alertCounter].show = false
+				mt.messagesToAlertToUser[alertCounter].show = false
 				break
 			}
 		}
 
 		//app.Window().GetElementByID("alert3").Call("focus")
-		//p.Update()
+		//mt.Update()
 	}
 }
 
@@ -480,11 +478,21 @@ func (h *MagicTable) sortDataOnColumn(columnNumberToSortOn int, sortAscending bo
 
 */
 
-func (h *MagicTable) getColumnsMetadata() (magicTableMetaDataType, bool, error) {
+func (mt *MagicTable) getColumnsMetadata() (magicTableMetaDataType, bool, error) {
+
+	mt.logger.WithFields(logrus.Fields{
+		"Id": "ca5dd6c2-b071-4d15-b406-ced54c3e124e",
+	}).Debug("Entering: getColumnsMetadata()")
+
+	defer func() {
+		mt.logger.WithFields(logrus.Fields{
+			"Id": "08e24c3b-6872-402e-aac0-067d8f043561",
+		}).Debug("Exiting: getColumnsMetadata()")
+	}()
 
 	magicTableMetadataRequest := api.MagicTableMetadataRequest{
-		MagicTableMetadataType: h.tableType,
-		TableTypeGuid:          h.tableTypeGuid,
+		MagicTableMetadataType: mt.tableType,
+		TableTypeGuid:          mt.tableTypeGuid,
 	}
 	magicTableMetadataRespons, err := api.CallApiGetMagicTableMetadata(magicTableMetadataRequest)
 
@@ -492,21 +500,21 @@ func (h *MagicTable) getColumnsMetadata() (magicTableMetaDataType, bool, error) 
 		fmt.Println("api.CallApiGetMagicTableMetadata Error:", err)
 		return nil, false, err
 	} else {
-		h.testDataAndMetaData.magicTableMetaData = magicTableMetadataRespons.GetMagicTableColumnsMetadata()
+		mt.testDataAndMetaData.magicTableMetaData = magicTableMetadataRespons.GetMagicTableColumnsMetadata()
 	}
 
 	return magicTableMetadataRespons.GetMagicTableColumnsMetadata(), magicTableMetadataRespons.SearchbarIsVisible, err
 }
 
-func (p *MagicTable) MyOnInputChange(ctx app.Context, e app.Event) {
-	p.searchString = ctx.JSSrc.Get("value").String()
-	//p.searchString = src.Get("value").String()
-	//p.Update()
-	p.RetrieveTableDataFromDB(p.searchString)
+func (mt *MagicTable) MyOnInputChange(ctx app.Context, e app.Event) {
+	mt.searchString = ctx.JSSrc.Get("value").String()
+	//mt.searchString = src.Get("value").String()
+	//mt.Update()
+	mt.RetrieveTableDataFromDB(mt.searchString)
 }
 
 // Get all tables that can be edited
-func (h *MagicTable) getTableTypeSelectorOptionsFromDB() error {
+func (mt *MagicTable) getTableTypeSelectorOptionsFromDB() error {
 	instances, err := api.CallApiListTablesToEdit(api.EmptyParameter{})
 
 	if err != nil {
@@ -514,7 +522,7 @@ func (h *MagicTable) getTableTypeSelectorOptionsFromDB() error {
 		return err
 	}
 
-	h.tableTypeSelectorOptionsInDB = instances.MyListTableToEdit
+	mt.tableTypeSelectorOptionsInDB = instances.MyListTableToEdit
 
 	return nil
 }

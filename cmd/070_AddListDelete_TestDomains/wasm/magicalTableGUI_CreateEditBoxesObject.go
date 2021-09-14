@@ -5,22 +5,22 @@ import (
 )
 
 // CreateEditBoxes Generates the GUI objects for the Edit boxes to be able to do New, Edit, Delete
-func (p *MagicTable) CreateEditBoxes() ([]app.UI, error) {
+func (mt *MagicTable) CreateEditBoxes() ([]app.UI, error) {
 	var err error
 	err = nil
 
 	// Check if they should be enabled or not
-	areNewUpdateDeleteTextBoxesEnabled := p.areNewUpdateDeleteTextBoxesDisabled()
+	areNewUpdateDeleteTextBoxesEnabled := mt.areNewUpdateDeleteTextBoxesDisabled()
 	// Dynamically create column headers for MagicTable
 	editRows := []app.UI{}
-	for _, columnMetadataResponse := range p.testDataAndMetaData.magicTableMetaData {
+	for _, columnMetadataResponse := range mt.testDataAndMetaData.magicTableMetaData {
 
 		//rowLabel := app.Label().
 		//	Text(columnMetadataResponse.GetColumnHeaderName())
 		rowLabel := columnMetadataResponse.GetColumnHeaderName()
 
 		columnDataName := columnMetadataResponse.GetColumnDataName()
-		rowTextBoxValue := p.GetRowTextBoxValueForEdit(columnDataName)
+		rowTextBoxValue := mt.GetRowTextBoxValueForEdit(columnDataName)
 
 		elem := app.Window().GetElementByID(columnDataName)
 		if elem.Type() == 6 {
@@ -30,7 +30,7 @@ func (p *MagicTable) CreateEditBoxes() ([]app.UI, error) {
 			rowTextBox := app.Input().
 				Value(rowTextBoxValue).
 				ID(columnDataName).
-				OnDblClick(p.OnTextboxDblClickappWrapper(columnDataName)).
+				OnDblClick(mt.OnTextboxDblClickappWrapper(columnDataName)).
 				Disabled(areNewUpdateDeleteTextBoxesEnabled)
 			fmt.Println("elem_xxxx_rowTextBoxValue:", rowTextBoxValue) //elem.Get("value")
 		*/

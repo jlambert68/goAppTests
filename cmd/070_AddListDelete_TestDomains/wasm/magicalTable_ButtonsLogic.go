@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func (p *MagicTable) isButtonDisabled(buttonToEvaluate int) (buttonText string, buttonDisbled bool) {
+func (mt *MagicTable) isButtonDisabled(buttonToEvaluate int) (buttonText string, buttonDisbled bool) {
 
 	//fmt.Println("Button isButtonDisabled: " + strconv.Itoa(buttonToEvaluate))
 
@@ -15,7 +15,7 @@ func (p *MagicTable) isButtonDisabled(buttonToEvaluate int) (buttonText string, 
 		//fmt.Println("isButtonDisabled: 'NewButton'")
 		buttonText = "New"
 
-		switch p.tableState {
+		switch mt.tableState {
 		case TableState_List:
 			buttonDisbled = false
 
@@ -27,9 +27,9 @@ func (p *MagicTable) isButtonDisabled(buttonToEvaluate int) (buttonText string, 
 		//fmt.Println("iisButtonDisabled: 'EditButton'")
 		buttonText = "Edit"
 
-		switch p.tableState {
+		switch mt.tableState {
 		case TableState_List:
-			if p.rowSelected > -1 {
+			if mt.rowSelected > -1 {
 				buttonDisbled = false
 			} else {
 				buttonDisbled = true
@@ -43,9 +43,9 @@ func (p *MagicTable) isButtonDisabled(buttonToEvaluate int) (buttonText string, 
 		//fmt.Println("isButtonDisabled: 'DeleteButton'")
 		buttonText = "Delete"
 
-		switch p.tableState {
+		switch mt.tableState {
 		case TableState_List:
-			if p.rowSelected > -1 {
+			if mt.rowSelected > -1 {
 				buttonDisbled = false
 			} else {
 				buttonDisbled = true
@@ -58,7 +58,7 @@ func (p *MagicTable) isButtonDisabled(buttonToEvaluate int) (buttonText string, 
 	case SaveButton:
 		//fmt.Println("isButtonDisabled: 'SaveButton'")
 
-		switch p.tableState {
+		switch mt.tableState {
 		case TableState_New:
 			buttonText = "Save"
 			buttonDisbled = false
@@ -79,7 +79,7 @@ func (p *MagicTable) isButtonDisabled(buttonToEvaluate int) (buttonText string, 
 
 	case CancelButton:
 		//fmt.Println("onButtonClickWrapper is called: 'CancelButton'")
-		switch p.tableState {
+		switch mt.tableState {
 		case TableState_New,
 			TableState_Edit,
 			TableState_Delete:
@@ -99,28 +99,28 @@ func (p *MagicTable) isButtonDisabled(buttonToEvaluate int) (buttonText string, 
 	return buttonText, buttonDisbled
 }
 
-func (p *MagicTable) onButtonClickWrapper(buttonThatWasClicked int) app.EventHandler {
+func (mt *MagicTable) onButtonClickWrapper(buttonThatWasClicked int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
-		p.onButtonClick(buttonThatWasClicked)
+		mt.onButtonClick(buttonThatWasClicked)
 
 	}
 }
-func (p *MagicTable) onButtonClick(buttonThatWasClicked int) {
+func (mt *MagicTable) onButtonClick(buttonThatWasClicked int) {
 
 	//fmt.Println("Button that was clicked: " + strconv.Itoa(buttonThatWasClicked))
 
 	switch buttonThatWasClicked {
 	case NewButton:
 		//fmt.Println("onButtonClickWrapper is called: 'NewButton'")
-		p.tableState = TableState_New
+		mt.tableState = TableState_New
 
 	case EditButton:
 		//fmt.Println("onButtonClickWrapper is called: 'EditButton'")
-		p.tableState = TableState_Edit
-		for _, columnMetadataResponse := range p.testDataAndMetaData.magicTableMetaData {
+		mt.tableState = TableState_Edit
+		for _, columnMetadataResponse := range mt.testDataAndMetaData.magicTableMetaData {
 
 			columnDataName := columnMetadataResponse.GetColumnDataName()
-			//rowTextBoxValue := p.GetRowTextBoxValueForEdit(columnDataName)
+			//rowTextBoxValue := mt.GetRowTextBoxValueForEdit(columnDataName)
 			elem := app.Window().
 				GetElementByID(columnDataName)
 			fmt.Println(columnDataName, elem.IsNull())
@@ -129,27 +129,27 @@ func (p *MagicTable) onButtonClick(buttonThatWasClicked int) {
 
 	case DeleteButton:
 		//fmt.Println("onButtonClickWrapper is called: 'DeleteButton'")
-		p.tableState = TableState_Delete
+		mt.tableState = TableState_Delete
 
 	case SaveButton:
 		//fmt.Println("onButtonClickWrapper is called: 'SaveButton'")
-		switch p.tableState {
+		switch mt.tableState {
 		case TableState_New:
-			p.tableState = TableState_New_Save
+			mt.tableState = TableState_New_Save
 			//fmt.Println("Current State: 'TableState_New_Save'")
 
-			p.tableState = TableState_List
+			mt.tableState = TableState_List
 			//fmt.Println("Current State: 'TableState_List'")
 
 		case TableState_Edit:
-			p.tableState = TableState_Edit_Save
+			mt.tableState = TableState_Edit_Save
 			//fmt.Println("Current State: 'TableState_Edit_Save'")
 
-			p.tableState = TableState_List
+			mt.tableState = TableState_List
 			//fmt.Println("Current State: 'TableState_List'")
 
 		case TableState_Delete:
-			p.tableState = TableState_Delete_Save
+			mt.tableState = TableState_Delete_Save
 			//fmt.Println("Current State: 'TableState_Delete_Save'")
 			app.Window().
 				GetElementByID("openModalButton").
@@ -158,40 +158,40 @@ func (p *MagicTable) onButtonClick(buttonThatWasClicked int) {
 			//GetElementByID("staticBackdrop").
 			//Set("bs-toggle", "modal")
 			//Call("modal")
-			//p.tableState = TableState_List
+			//mt.tableState = TableState_List
 			//fmt.Println("Current State: 'TableState_List'")
 
 		default:
-			fmt.Println("Unknown state: " + strconv.Itoa(p.tableState))
+			fmt.Println("Unknown state: " + strconv.Itoa(mt.tableState))
 
 		}
 
 	case CancelButton:
 		//fmt.Println("onButtonClickWrapper is called: 'CancelButton'")
-		switch p.tableState {
+		switch mt.tableState {
 		case TableState_New:
-			p.tableState = TableState_New_Cancel
+			mt.tableState = TableState_New_Cancel
 			//fmt.Println("Current State: 'TableState_New_Cancel'")
 
-			p.tableState = TableState_List
+			mt.tableState = TableState_List
 			//fmt.Println("Current State: 'TableState_List'")
 
 		case TableState_Edit:
-			p.tableState = TableState_Edit_Cancel
+			mt.tableState = TableState_Edit_Cancel
 			//fmt.Println("Current State: 'TableState_Edit_Cancel'")
 
-			p.tableState = TableState_List
+			mt.tableState = TableState_List
 			//fmt.Println("Current State: 'TableState_List'")
 
 		case TableState_Delete:
-			p.tableState = TableState_Delete_Cancel
+			mt.tableState = TableState_Delete_Cancel
 			//fmt.Println("Current State: 'TableState_Delete_Cancel'")
 
-			p.tableState = TableState_List
+			mt.tableState = TableState_List
 			//fmt.Println("Current State: 'TableState_List'")
 
 		default:
-			fmt.Println("Unknown state: " + strconv.Itoa(p.tableState))
+			fmt.Println("Unknown state: " + strconv.Itoa(mt.tableState))
 
 		}
 
@@ -199,5 +199,5 @@ func (p *MagicTable) onButtonClick(buttonThatWasClicked int) {
 		fmt.Println("onButtonClickWrapper is called with unknown value: " + strconv.Itoa(buttonThatWasClicked))
 	}
 
-	p.Update()
+	mt.Update()
 }

@@ -1,15 +1,23 @@
 package main
 
-import "github.com/maxence-charriere/go-app/v8/pkg/app"
+import (
+	"github.com/maxence-charriere/go-app/v8/pkg/app"
+	"github.com/sirupsen/logrus"
+)
 
 // Generates the GUI objects for the rows in the table
-func (p *MagicTable) CreateTableTypeSelectorObject() (app.HTMLSelect, error) {
+func (mt *MagicTable) CreateTableTypeSelectorObject() (app.HTMLSelect, error) {
+
+	mt.logger.WithFields(logrus.Fields{
+		"Id": "80998c75-b018-4a8c-b8e4-d5c8b0adc5da",
+	}).Debug("Entering: CreateTableTypeSelectorObject()")
+
 	var err error
 	err = nil
 
 	var tableTypeSelectorDisabled bool
 
-	switch p.tableState {
+	switch mt.tableState {
 	case TableState_List:
 		tableTypeSelectorDisabled = false
 
@@ -19,7 +27,7 @@ func (p *MagicTable) CreateTableTypeSelectorObject() (app.HTMLSelect, error) {
 
 	// Generate list of options for DropDown
 	tableTypeSelectorOptions := []app.UI{}
-	for _, tableTypeSelectorOption := range p.tableTypeSelectorOptionsInDB {
+	for _, tableTypeSelectorOption := range mt.tableTypeSelectorOptionsInDB {
 		tempOption := app.Option().
 			Value(tableTypeSelectorOption.Guid).
 			Text(tableTypeSelectorOption.TableName)
@@ -33,26 +41,30 @@ func (p *MagicTable) CreateTableTypeSelectorObject() (app.HTMLSelect, error) {
 		app.Option().
 			Text("Open this select menu").
 			Selected(true),
-		app.Range(p.tableTypeSelectorOptionsInDB).
+		app.Range(mt.tableTypeSelectorOptionsInDB).
 			Slice(func(arrayCounter int) app.UI {
 				return app.Option().
-					Value(p.tableTypeSelectorOptionsInDB[arrayCounter].Guid).
-					Text(p.tableTypeSelectorOptionsInDB[arrayCounter].TableName)
-			})).OnChange(p.MyOnChangeTableEditDropDownWrapper())
+					Value(mt.tableTypeSelectorOptionsInDB[arrayCounter].Guid).
+					Text(mt.tableTypeSelectorOptionsInDB[arrayCounter].TableName)
+			})).OnChange(mt.MyOnChangeTableEditDropDownWrapper())
+
+	mt.logger.WithFields(logrus.Fields{
+		"Id": "a87e32ec-4d87-4f93-9b44-4f1fdcca5dfa",
+	}).Debug("Exiting: CreateTableTypeSelectorObject()")
 
 	return tableTypeSelector, err
 }
 
 // MyOnChangeTableEditDropDownWrapper is triggered when user change value in tableTypeSelector-dropdown
-func (p *MagicTable) MyOnChangeTableEditDropDownWrapper() app.EventHandler {
+func (mt *MagicTable) MyOnChangeTableEditDropDownWrapper() app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 		guid := ctx.JSSrc.Get("value").String()
-		p.tableTypeGuid = guid
+		mt.tableTypeGuid = guid
 
 		// Trigger reload correct data
 
-		p.reloadHeaderMetaData = true
-		p.Update()
+		mt.reloadHeaderMetaData = true
+		mt.Update()
 
 	}
 }

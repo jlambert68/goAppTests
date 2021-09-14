@@ -6,7 +6,7 @@ import (
 )
 
 // GenerateAlertMessages generates the GUI objects for all alert messages
-func (p *MagicTable) GenerateAlertMessages() ([]app.UI, error) {
+func (mt *MagicTable) GenerateAlertMessages() ([]app.UI, error) {
 	var err error
 	err = nil
 
@@ -17,15 +17,15 @@ func (p *MagicTable) GenerateAlertMessages() ([]app.UI, error) {
 		</div>
 	*/
 	/*
-		numberOfElementsInAlerts := len(p.messagesToAlertToUser)
+		numberOfElementsInAlerts := len(mt.messagesToAlertToUser)
 		for alertMessageIndex := numberOfElementsInAlerts - 1; alertMessageIndex >= 0; alertMessageIndex-- {
-			//fmt.Println("Ska inte bort: ", p.messagesToAlertToUser[alertMessageIndex], app.Window().GetElementByID(p.messagesToAlertToUser[alertMessageIndex].id))
-			if p.messagesToAlertToUser[alertMessageIndex].processCount >= 2 {
-				//fmt.Println("Vid borttag: ", p.messagesToAlertToUser[alertMessageIndex], app.Window().GetElementByID(p.messagesToAlertToUser[alertMessageIndex].id))
-				if app.Window().GetElementByID(p.messagesToAlertToUser[alertMessageIndex].id).IsNull() {
-					fmt.Println("Vid borttag2: ", p.messagesToAlertToUser[alertMessageIndex].id)
-					p.messagesToAlertToUser = p.removeIndexFromMagicTable(p.messagesToAlertToUser, alertMessageIndex)
-					//alertElement := app.Window().GetElementByID(p.messagesToAlertToUser[alertMessageIndex].id)
+			//fmt.Println("Ska inte bort: ", mt.messagesToAlertToUser[alertMessageIndex], app.Window().GetElementByID(mt.messagesToAlertToUser[alertMessageIndex].id))
+			if mt.messagesToAlertToUser[alertMessageIndex].processCount >= 2 {
+				//fmt.Println("Vid borttag: ", mt.messagesToAlertToUser[alertMessageIndex], app.Window().GetElementByID(mt.messagesToAlertToUser[alertMessageIndex].id))
+				if app.Window().GetElementByID(mt.messagesToAlertToUser[alertMessageIndex].id).IsNull() {
+					fmt.Println("Vid borttag2: ", mt.messagesToAlertToUser[alertMessageIndex].id)
+					mt.messagesToAlertToUser = mt.removeIndexFromMagicTable(mt.messagesToAlertToUser, alertMessageIndex)
+					//alertElement := app.Window().GetElementByID(mt.messagesToAlertToUser[alertMessageIndex].id)
 					//alertElement.Call("dispose")
 				}
 			}
@@ -33,13 +33,13 @@ func (p *MagicTable) GenerateAlertMessages() ([]app.UI, error) {
 
 
 	*/
-	//fmt.Println("Antal Alerts: " + strconv.Itoa(len(p.messagesToAlertToUser)))
+	//fmt.Println("Antal Alerts: " + strconv.Itoa(len(mt.messagesToAlertToUser)))
 	alertMessages := []app.UI{}
-	for alertMessageToUserIndex, alertMessageToUser := range p.messagesToAlertToUser {
+	for alertMessageToUserIndex, alertMessageToUser := range mt.messagesToAlertToUser {
 
-		//fmt.Println(p.messagesToAlertToUser)
+		//fmt.Println(mt.messagesToAlertToUser)
 
-		p.messagesToAlertToUser[alertMessageToUserIndex].processCount = p.messagesToAlertToUser[alertMessageToUserIndex].processCount + 1
+		mt.messagesToAlertToUser[alertMessageToUserIndex].processCount = mt.messagesToAlertToUser[alertMessageToUserIndex].processCount + 1
 		showAlertClass := "show"
 		//fmt.Println(alertMessageToUser.id, alertMessageToUser.show)
 		if alertMessageToUser.show == true {
@@ -61,7 +61,7 @@ func (p *MagicTable) GenerateAlertMessages() ([]app.UI, error) {
 					DataSet("bs-dismiss", "alert").
 					DataSet("aria-label", "Close").
 					ID(alertMessageToUser.id+"button").
-					//OnClick(p.onCloseAlertWrapper(alertMessageToUser.id)).
+					//OnClick(mt.onCloseAlertWrapper(alertMessageToUser.id)).
 					TabIndex(-1))
 
 		if alertMessageToUser.show == true {

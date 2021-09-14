@@ -5,19 +5,19 @@ import (
 )
 
 // Generates the GUI objects for the columns in the table
-func (p *MagicTable) CreateSearchBar() (app.HTMLDiv, error) {
+func (mt *MagicTable) CreateSearchBar() (app.HTMLDiv, error) {
 	var err error
 	var searchInput app.HTMLDiv
 	err = nil
 	searchInput = nil
 
-	if p.searchbarIsVisible == true {
+	if mt.searchbarIsVisible == true {
 		input := app.Input().
 			Class("form-control").
-			Value(p.searchString).
+			Value(mt.searchString).
 			Placeholder("t2.small").
 			AutoFocus(true).
-			OnKeyup(p.MyOnInputChange)
+			OnKeyup(mt.MyOnInputChange)
 
 		searchInput = app.Div().
 			Class("input-group").

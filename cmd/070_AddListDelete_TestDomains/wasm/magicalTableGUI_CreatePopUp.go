@@ -6,11 +6,11 @@ import (
 )
 
 // Generates the GUI objects for the columns in the table
-func (p *MagicTable) CreatePopUp() (app.HTMLButton, app.HTMLDiv, error) {
+func (mt *MagicTable) CreatePopUp() (app.HTMLButton, app.HTMLDiv, error) {
 	var err error
 	err = nil
 
-	buttonText, _ := p.isButtonDisabled(SaveButton)
+	buttonText, _ := mt.isButtonDisabled(SaveButton)
 
 	openPopUp := app.Button().
 		Type("button").
@@ -63,61 +63,61 @@ func (p *MagicTable) CreatePopUp() (app.HTMLButton, app.HTMLDiv, error) {
 									app.Button().Type("button").
 										Class("btn btn-primary").
 										Text(buttonText).
-										OnClick(p.onModalOKClicked())))))
+										OnClick(mt.onModalOKClicked())))))
 
 	return openPopUp, popUp, err
 }
 
-func (p *MagicTable) onCloseModalWrapper() app.EventHandler {
+func (mt *MagicTable) onCloseModalWrapper() app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
-		p.changeStateToList()
+		mt.changeStateToList()
 	}
 }
 
-func (p *MagicTable) changeStateToList() {
-	p.tableState = TableState_List
+func (mt *MagicTable) changeStateToList() {
+	mt.tableState = TableState_List
 	fmt.Println("Close Modal triggered this")
-	p.Update()
+	mt.Update()
 }
 
-func (p *MagicTable) onModalOKClicked() app.EventHandler {
+func (mt *MagicTable) onModalOKClicked() app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
-		switch p.tableState {
+		switch mt.tableState {
 
 		case TableState_Delete_Save:
 			fmt.Println("Send 'Delete' to DB")
-			p.rowSelected = -1
-			p.uniqueRowSelected = -1
+			mt.rowSelected = -1
+			mt.uniqueRowSelected = -1
 
 		default:
-			fmt.Println("Wrong TableState, shouldn't be here:", p.tableState)
+			fmt.Println("Wrong TableState, shouldn't be here:", mt.tableState)
 
 		}
 		app.Window().
 			GetElementByID("ModalCancel").
 			Call("click")
-		p.tableState = TableState_List
-		p.Update()
+		mt.tableState = TableState_List
+		mt.Update()
 
 	}
 }
 
-func (p *MagicTable) onModalCancelClicked() app.EventHandler {
+func (mt *MagicTable) onModalCancelClicked() app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
-		switch p.tableState {
+		switch mt.tableState {
 
 		case TableState_Delete_Save:
 			fmt.Println("Cancelling Send to DB")
 
 		default:
-			fmt.Println("Wrong TableState, shouldn't be here:", p.tableState)
+			fmt.Println("Wrong TableState, shouldn't be here:", mt.tableState)
 
 		}
 		app.Window().
 			GetElementByID("ModalCancel").
 			Call("click")
-		p.tableState = TableState_List
-		p.Update()
+		mt.tableState = TableState_List
+		mt.Update()
 
 	}
 }
