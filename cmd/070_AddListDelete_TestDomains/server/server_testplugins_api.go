@@ -3,15 +3,28 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"goAppTest1/cmd/070_AddListDelete_TestDomains/protos/api"
 )
 
 func (server *Server) ListTestInstructions(ctx context.Context, in *api.EmptyParameter) (*api.ListTestInstructionsRespons, error) {
 
+	server.logger.WithFields(logrus.Fields{
+		"Id":    "830d4bd0-4aef-4cfe-94c6-239de5f1ad12",
+		"Trace": server.trace(false),
+	}).Debug("Entering: ListTestInstructions()")
+
+	defer func() {
+		server.logger.WithFields(logrus.Fields{
+			"Id":    "b21e5aaa-f5e3-465e-8a65-f3f246d367ce",
+			"Trace": server.trace(false),
+		}).Debug("Exiting: ListTestInstructions()")
+	}()
+
 	var testInstructionsRespons *api.ListTestInstructionsRespons
 	var myListTestInstructionsRespons []*api.ListTestInstructionRespons
 
-	testInstructionsFromDB, err := ListTestInstructionsInDB()
+	testInstructionsFromDB, err := server.ListTestInstructionsInDB()
 	if err != nil {
 		fmt.Println(err.Error())
 		return testInstructionsRespons, err

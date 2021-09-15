@@ -2,10 +2,24 @@ package server
 
 import (
 	"context"
+	"github.com/sirupsen/logrus"
 	"goAppTest1/cmd/070_AddListDelete_TestDomains/protos/api"
 )
 
-func ListTablesToEditInDB() ([]api.ListTableToEdit, error) {
+func (server *Server) ListTablesToEditInDB() ([]api.ListTableToEdit, error) {
+
+	server.logger.WithFields(logrus.Fields{
+		"Id":    "8555f387-d44d-4d8a-ae4f-0382c20a835a",
+		"Trace": server.trace(false),
+	}).Debug("Entering: ListTablesToEditInDB()")
+
+	defer func() {
+		server.logger.WithFields(logrus.Fields{
+			"Id":    "1d4a3138-21da-43b4-828b-2a525c75878f",
+			"Trace": server.trace(false),
+		}).Debug("Exiting: ListTablesToEditInDB()")
+	}()
+
 	sqlToExecute := ""
 	sqlToExecute = sqlToExecute + "SELECT tabletoedit.id, tabletoedit.guid, tabletoedit.table_name "
 	sqlToExecute = sqlToExecute + "FROM tabletoedit "

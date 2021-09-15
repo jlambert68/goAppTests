@@ -80,6 +80,7 @@ func main() {
 
 	// *******************************
 	// Set up and connect to DB
+
 	server.ConnectToDB()
 
 	// Close DB-pool when closing program

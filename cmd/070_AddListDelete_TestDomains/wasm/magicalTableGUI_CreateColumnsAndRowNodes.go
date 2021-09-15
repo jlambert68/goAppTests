@@ -82,6 +82,11 @@ func (mt *MagicTable) UpdateRowNodes() error {
 				columnData = mt.formatColumnData_TestDomains(mt.testDataAndMetaData.testDomains[rowCounter], columnName)
 				uniqueId = int64(mt.testDataAndMetaData.testDomains[rowCounter].Id)
 
+				// Check for last item
+				if rowCounter+1 == int64(len(mt.testDataAndMetaData.testDomains)) {
+					breakLoop = true
+				}
+
 			// TestInstructions
 			//case "81c5d008-a38a-4c47-936a-d6c3c258ae13":
 
@@ -95,6 +100,7 @@ func (mt *MagicTable) UpdateRowNodes() error {
 			if shouldBeShown == true {
 				rowNodes = append(rowNodes, app.Td().Body(app.Text(columnData)))
 			}
+
 		}
 		// Set background color on selected row
 		var rowSelectedColor string

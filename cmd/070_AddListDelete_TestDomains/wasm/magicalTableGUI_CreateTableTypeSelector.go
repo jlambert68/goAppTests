@@ -48,10 +48,6 @@ func (mt *MagicTable) CreateTableTypeSelectorObject() (app.HTMLSelect, error) {
 					Text(mt.tableTypeSelectorOptionsInDB[arrayCounter].TableName)
 			})).OnChange(mt.MyOnChangeTableEditDropDownWrapper())
 
-	mt.logger.WithFields(logrus.Fields{
-		"Id": "a87e32ec-4d87-4f93-9b44-4f1fdcca5dfa",
-	}).Debug("Exiting: CreateTableTypeSelectorObject()")
-
 	return tableTypeSelector, err
 }
 

@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"goAppTest1/cmd/070_AddListDelete_TestDomains/protos/api"
 )
 
@@ -13,7 +14,22 @@ func (server *Server) GetMagicTableMetadata(ctx context.Context, in *api.MagicTa
 	var magicTableColumnsMetadataResponse []*api.MagicTableColumnMetadata
 	var err error
 
-	magicTableColumnsMetadataFromDB, err := listMagicTableColumnMetadataForjsonFile(in.TableTypeGuid)
+	// Initiate logger if not already done
+	server.checkIfLoggerIsInitiated()
+
+	server.logger.WithFields(logrus.Fields{
+		"Id":    "becb4612-2f92-433d-9553-b64eae6af3f5",
+		"Trace": server.trace(false),
+	}).Debug("Entering: GetMagicTableMetadata()")
+
+	defer func() {
+		server.logger.WithFields(logrus.Fields{
+			"Id":    "278a5a9c-f3f5-4a42-a6ba-3de26dc6ce9f",
+			"Trace": server.trace(false),
+		}).Debug("Exiting: GetMagicTableMetadata()")
+	}()
+
+	magicTableColumnsMetadataFromDB, err := server.listMagicTableColumnMetadataForjsonFile(in.TableTypeGuid)
 	if err != nil {
 		fmt.Println(err.Error())
 		return magicTableMetadataRespons, err

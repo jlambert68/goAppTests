@@ -3,14 +3,14 @@ package server
 import (
 	"context"
 	"fmt"
-	"os"
-
 	"github.com/jackc/pgx/v4/pgxpool"
+	"os"
 )
 
 var DbPool *pgxpool.Pool
 
 func ConnectToDB() {
+
 	dbConnectionURL := "postgres://testuser:password@127.0.0.1:5432/testdb"
 
 	var err error

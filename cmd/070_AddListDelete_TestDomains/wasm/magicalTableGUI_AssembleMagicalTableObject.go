@@ -10,12 +10,14 @@ import (
 func (mt *MagicTable) AssembleMagicalTableObject() (app.HTMLDiv, error) {
 
 	mt.logger.WithFields(logrus.Fields{
-		"Id": "aa3ccd2d-2e9c-4b51-8241-9c645fe8632c",
+		"Id":    "aa3ccd2d-2e9c-4b51-8241-9c645fe8632c",
+		"Trace": mt.trace(false),
 	}).Debug("Entering: AssembleMagicalTableObject()")
 
 	defer func() {
 		mt.logger.WithFields(logrus.Fields{
-			"Id": "8455b278-cf1a-4e86-b1bd-0c6d0a1bd366",
+			"Id":    "8455b278-cf1a-4e86-b1bd-0c6d0a1bd366",
+			"Trace": mt.trace(false),
 		}).Debug("Exiting: AssembleMagicalTableObject()")
 	}()
 
