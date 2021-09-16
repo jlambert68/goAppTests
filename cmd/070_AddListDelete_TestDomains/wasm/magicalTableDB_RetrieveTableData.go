@@ -9,7 +9,7 @@ import (
 func (mt *MagicTable) RetrieveTableDataFromDB(q string) {
 
 	// Unselect rows
-	mt.rowSelected = -1
+	//mt.rowSelected = -1
 
 	mt.SearchInDB(q)
 	//instances := mt.SearchInDB(q)
@@ -23,6 +23,9 @@ func (mt *MagicTable) RetrieveTableDataFromDB(q string) {
 }
 
 func (mt *MagicTable) SearchInDB(q string) {
+
+	// Unselect rows
+	mt.rowSelected = -1
 
 	mt.logger.WithFields(logrus.Fields{
 		"Id": "843892ce-d69f-407d-8436-af2f6307b9c6",
@@ -50,6 +53,7 @@ func (mt *MagicTable) SearchInDB(q string) {
 		}
 
 		mt.testDataAndMetaData.originalTestdataInstances = originalInstances.Instances
+		fmt.Println("originalInstances.Instances: ", len(originalInstances.Instances))
 		return
 
 		// TestDomains
@@ -63,6 +67,7 @@ func (mt *MagicTable) SearchInDB(q string) {
 		}
 
 		mt.testDataAndMetaData.testDomains = testDomainInstances.TestDomainForListing
+		//fmt.Println("testDomainInstances.TestDomainForListing: ", len(testDomainInstances.TestDomainForListing))
 		return
 
 	// TestInstructions

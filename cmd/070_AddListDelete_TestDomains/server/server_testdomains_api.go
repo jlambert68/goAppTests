@@ -32,7 +32,7 @@ func (server *Server) ListTestDomains(ctx context.Context, in *api.EmptyParamete
 
 	//fmt.Println(testDomainsFromDB)
 
-	for _, testDomainFromDB := range testDomainsFromDB {
+	for rowNumber, testDomainFromDB := range testDomainsFromDB {
 
 		testDomain := &api.TestDomainForListingMessage{
 			Id:              testDomainFromDB.Id,
@@ -43,6 +43,7 @@ func (server *Server) ListTestDomains(ctx context.Context, in *api.EmptyParamete
 			Activated:       testDomainFromDB.Activated,
 			Deleted:         testDomainFromDB.Deleted,
 			UpdateTimestamp: testDomainFromDB.UpdateTimestamp,
+			UniqueId:        int64(rowNumber),
 		}
 
 		testDomainForListingMessages = append(testDomainForListingMessages, testDomain)

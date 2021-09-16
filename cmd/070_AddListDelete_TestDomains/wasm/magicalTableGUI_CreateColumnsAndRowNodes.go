@@ -79,8 +79,9 @@ func (mt *MagicTable) UpdateRowNodes() error {
 
 				// TestDomains
 			case "8acacaaf-676e-4b36-abe6-c5310822ade1":
+				//fmt.Println("mt.testDataAndMetaData.testDomains.len: ", len(mt.testDataAndMetaData.testDomains))
 				columnData = mt.formatColumnData_TestDomains(mt.testDataAndMetaData.testDomains[rowCounter], columnName)
-				uniqueId = int64(mt.testDataAndMetaData.testDomains[rowCounter].Id)
+				uniqueId = mt.testDataAndMetaData.testDomains[rowCounter].UniqueId
 
 				// Check for last item
 				if rowCounter+1 == int64(len(mt.testDataAndMetaData.testDomains)) {
@@ -201,10 +202,14 @@ func (mt *MagicTable) formatColumnData_OrignalTestdata(v *api.Instance, field st
 
 func (mt *MagicTable) formatColumnData_TestDomains(v *api.TestDomainForListingMessage, field string) string {
 
+	fmt.Println(v, " - ", field)
+
 	var returnValue string
 
 	r := reflect.ValueOf(v)
 	f := reflect.Indirect(r).FieldByName(field)
+
+	fmt.Println(r, " - ", f)
 
 	returnValue = fmt.Sprintf("%v", f)
 

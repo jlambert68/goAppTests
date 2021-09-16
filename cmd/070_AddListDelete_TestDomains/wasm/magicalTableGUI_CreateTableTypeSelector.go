@@ -58,7 +58,9 @@ func (mt *MagicTable) MyOnChangeTableEditDropDownWrapper() app.EventHandler {
 		mt.tableTypeGuid = guid
 
 		// Trigger reload correct data
+		mt.SearchInDB("")
 
+		// Set MagicalTable to update
 		mt.reloadHeaderMetaData = true
 		mt.Update()
 

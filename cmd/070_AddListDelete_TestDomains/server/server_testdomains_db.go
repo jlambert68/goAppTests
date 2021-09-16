@@ -2,9 +2,9 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"github.com/sirupsen/logrus"
 	"goAppTest1/cmd/070_AddListDelete_TestDomains/protos/api"
-	"time"
 )
 
 func (server *Server) ListTestDomainsInDB() ([]api.TestDomainForListingMessage, error) {
@@ -31,16 +31,18 @@ func (server *Server) ListTestDomainsInDB() ([]api.TestDomainForListingMessage, 
 
 	var testDomainForListingMessage api.TestDomainForListingMessage
 	var returnMessage []api.TestDomainForListingMessage
-	var myTimeStamp time.Time
+	var myTimeStamp interface{} //time.Time
 
 	for rows.Next() {
+
 		err := rows.Scan(&testDomainForListingMessage.Id, &testDomainForListingMessage.Guid, &testDomainForListingMessage.Name, &testDomainForListingMessage.Description, &testDomainForListingMessage.ReadyForUse, &testDomainForListingMessage.Activated, &testDomainForListingMessage.Deleted, myTimeStamp)
 		if err != nil {
 			return returnMessage, err
 		}
-		testDomainForListingMessage.UpdateTimestamp = myTimeStamp.String()
+		testDomainForListingMessage.UpdateTimestamp = fmt.Sprintf("%v", myTimeStamp) // myTimeStamp.String()
 		returnMessage = append(returnMessage, testDomainForListingMessage)
 
+		fmt.Println("XXXXXXXXX testDomainForListingMessage: ", testDomainForListingMessage)
 	}
 
 	return returnMessage, rows.Err()

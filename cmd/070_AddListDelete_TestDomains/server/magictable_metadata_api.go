@@ -48,6 +48,8 @@ func (server *Server) GetMagicTableMetadata(ctx context.Context, in *api.MagicTa
 			ShouldBeVisible:        magicTableColumnsMetadata.ShouldBeVisible,
 		}
 
+		//fmt.Println(magicTableColumnMetadata)
+
 		magicTableColumnsMetadataResponse = append(magicTableColumnsMetadataResponse, magicTableColumnMetadata)
 
 	}

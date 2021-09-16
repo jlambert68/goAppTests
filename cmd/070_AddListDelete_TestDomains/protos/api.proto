@@ -97,6 +97,7 @@ message testDomainForListingMessage {
   bool Activated = 6;
   bool Deleted = 7;
   string UpdateTimestamp = 8;
+  int64 UniqueId = 9;
 }
 
 message ListTestDomainsRespons {

@@ -14,7 +14,7 @@ func CallApiSearch(input SearchRequest) (*Instances, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", "/api.Api/SearchInDB", strings.NewReader(string(str)))
+	req, err := http.NewRequest("POST", "/api.Api/Search", strings.NewReader(string(str)))
 	if err != nil {
 		return nil, err
 	}
