@@ -42,7 +42,7 @@ func (server *Server) ListTestDomainsInDB() ([]api.TestDomainForListingMessage, 
 		testDomainForListingMessage.UpdateTimestamp = fmt.Sprintf("%v", myTimeStamp) // myTimeStamp.String()
 		returnMessage = append(returnMessage, testDomainForListingMessage)
 
-		fmt.Println("XXXXXXXXX testDomainForListingMessage: ", testDomainForListingMessage)
+		//fmt.Println("XXXXXXXXX testDomainForListingMessage: ", testDomainForListingMessage)
 	}
 
 	return returnMessage, rows.Err()

@@ -29,7 +29,7 @@ func (server *Server) GetMagicTableMetadata(ctx context.Context, in *api.MagicTa
 		}).Debug("Exiting: GetMagicTableMetadata()")
 	}()
 
-	magicTableColumnsMetadataFromDB, err := server.listMagicTableColumnMetadataForjsonFile(in.TableTypeGuid)
+	magicTableColumnsMetadataFromDB, err := server.listMagicTableColumnMetadata(in.TableTypeGuid)
 	if err != nil {
 		fmt.Println(err.Error())
 		return magicTableMetadataRespons, err

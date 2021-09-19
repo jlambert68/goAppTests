@@ -6,18 +6,18 @@ import (
 	"goAppTest1/cmd/070_AddListDelete_TestDomains/protos/api"
 )
 
-func (server *Server) listMagicTableColumnMetadataForjsonFile(tableTypeGuid string) ([]api.MagicTableColumnMetadata, error) {
+func (server *Server) listMagicTableColumnMetadata(tableTypeGuid string) ([]api.MagicTableColumnMetadata, error) {
 
 	server.logger.WithFields(logrus.Fields{
 		"Id":    "4ff6f958-259d-4d58-91b4-2c79ceb871d3",
 		"Trace": server.trace(false),
-	}).Debug("Entering: listMagicTableColumnMetadataForjsonFile()")
+	}).Debug("Entering: listMagicTableColumnMetadata()")
 
 	defer func() {
 		server.logger.WithFields(logrus.Fields{
 			"Id":    "d943c3d1-e22a-469e-b16a-b1e4b70f1dc0",
 			"Trace": server.trace(false),
-		}).Debug("Exiting: listMagicTableColumnMetadataForjsonFile()")
+		}).Debug("Exiting: listMagicTableColumnMetadata()")
 	}()
 
 	sqlToExecute := ""

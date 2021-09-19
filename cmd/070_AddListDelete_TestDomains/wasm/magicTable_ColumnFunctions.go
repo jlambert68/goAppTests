@@ -94,7 +94,7 @@ func (mt *MagicTable) MyOnColumnClickWrapper(columnNumberThatWasClicked int) app
 			})
 			mt.Update()
 			//magicManager.Update()
-
+			//TODO Fix for all tables that are supported
 			// Update selected row
 			for rowCounter, i := range mt.testDataAndMetaData.originalTestdataInstances {
 

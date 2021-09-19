@@ -11,6 +11,7 @@ func (mt *MagicTable) CreateEditBoxes() ([]app.UI, error) {
 
 	// Check if they should be enabled or not
 	areNewUpdateDeleteTextBoxesEnabled := mt.areNewUpdateDeleteTextBoxesDisabled()
+
 	// Dynamically create column headers for MagicTable
 	editRows := []app.UI{}
 	for _, columnMetadataResponse := range mt.testDataAndMetaData.magicTableMetaData {

@@ -76,7 +76,8 @@ type alertMessageStruct struct {
 }
 
 type MagicTable struct {
-	logger *logrus.Logger
+	currentTableDataPointer interface{}
+	logger                  *logrus.Logger
 	app.Compo
 	manager              *MagicManager
 	reloadHeaderMetaData bool
@@ -142,7 +143,8 @@ func (mt *MagicTable) Render() app.UI {
 		mt.InitLogger("")
 
 		// Only for testing
-		mt.tableTypeGuid = "51253aba-41a9-42ef-b5f1-d8d1d7116b47"
+		mt.tableTypeGuid = "8acacaaf-676e-4b36-abe6-c5310822ade1" //DOmain
+		//mt.tableTypeGuid = "51253aba-41a9-42ef-b5f1-d8d1d7116b47" //Original
 
 		// No row is selected
 		mt.rowSelected = -1
@@ -250,6 +252,8 @@ func (mt *MagicTable) GetRowTextBoxValueForEdit(columnDataName string) string {
 
 	case TableState_Edit,
 		TableState_Delete:
+		//TODO No . Fix for all tables that are supported
+
 		rowData := mt.testDataAndMetaData.originalTestdataInstances[mt.rowSelected]
 		//returnValue =rowData.GetName()
 
@@ -333,7 +337,7 @@ func (mt *MagicTable) MyOnDblClickOnRow(rowThatWasDoubleClickedOn int64) {
 	if mt.tableState != TableState_List {
 		return
 	}
-
+	//TODO Fix for all tables that are supported
 	fmt.Println("OnDblClick is called::::::" + strconv.FormatInt(rowThatWasDoubleClickedOn, 10))
 	rowData := mt.testDataAndMetaData.originalTestdataInstances[rowThatWasDoubleClickedOn]
 	fmt.Println("RowData: " + rowData.String())
@@ -351,6 +355,7 @@ func (mt *MagicTable) MyOnClickOnRowWrapper(rowThatWasClickedOn int64) app.Event
 			return
 		}
 
+		//TODO Fix for all tables that are supported
 		fmt.Println("OnClick is called::::::" + strconv.FormatInt(rowThatWasClickedOn, 10))
 		rowData := mt.testDataAndMetaData.originalTestdataInstances[rowThatWasClickedOn]
 		fmt.Println("RowData: " + rowData.String())

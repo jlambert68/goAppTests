@@ -39,12 +39,21 @@ func (server *Server) InitLogger(filename string) {
 	}
 
 	logrus.SetLevel(LoggingLevel)
+
 	logrus.SetFormatter(&logrus.TextFormatter{
 		ForceColors:     true,
 		FullTimestamp:   true,
 		TimestampFormat: time.RFC3339Nano,
 		DisableSorting:  true,
 	})
+
+	/*
+		logrus.SetFormatter(&logrus.JSONFormatter{
+			TimestampFormat: time.RFC3339Nano,
+		})
+
+
+	*/
 
 	//If no file then set standard out
 
