@@ -252,13 +252,11 @@ func (mt *MagicTable) GetRowTextBoxValueForEdit(columnDataName string) string {
 
 	case TableState_Edit,
 		TableState_Delete:
-		//TODO No . Fix for all tables that are supported
 
-		rowData := mt.testDataAndMetaData.originalTestdataInstances[mt.rowSelected]
-		//returnValue =rowData.GetName()
+		currentTableDataPointerData := reflect.ValueOf(mt.currentTableDataPointer)
+		rowData := reflect.Indirect(currentTableDataPointerData).Index(int(mt.rowSelected - 1))
 
-		r := reflect.ValueOf(rowData)
-		f := reflect.Indirect(r).FieldByName(columnDataName)
+		f := reflect.Indirect(rowData).FieldByName(columnDataName)
 
 		returnValue = fmt.Sprintf("%v", f)
 
@@ -337,11 +335,19 @@ func (mt *MagicTable) MyOnDblClickOnRow(rowThatWasDoubleClickedOn int64) {
 	if mt.tableState != TableState_List {
 		return
 	}
-	//TODO Fix for all tables that are supported
+
 	fmt.Println("OnDblClick is called::::::" + strconv.FormatInt(rowThatWasDoubleClickedOn, 10))
-	rowData := mt.testDataAndMetaData.originalTestdataInstances[rowThatWasDoubleClickedOn]
-	fmt.Println("RowData: " + rowData.String())
-	fmt.Println("")
+	//rowData := mt.testDataAndMetaData.originalTestdataInstances[rowThatWasDoubleClickedOn]
+
+	//currentTableDataPointerData := reflect.ValueOf(mt.currentTableDataPointer)
+	//rowData := reflect.Indirect(currentTableDataPointerData).Index(int(rowThatWasDoubleClickedOn - 1))
+
+	//f := reflect.Indirect(rowData).FieldByName(columnDataName)
+
+	//returnValue = fmt.Sprintf("%v", f)
+
+	//fmt.Println("RowData: ", rowData)
+	//fmt.Println("")
 
 	// Trigger Edit
 	mt.onButtonClick(EditButton)
@@ -355,14 +361,18 @@ func (mt *MagicTable) MyOnClickOnRowWrapper(rowThatWasClickedOn int64) app.Event
 			return
 		}
 
-		//TODO Fix for all tables that are supported
 		fmt.Println("OnClick is called::::::" + strconv.FormatInt(rowThatWasClickedOn, 10))
-		rowData := mt.testDataAndMetaData.originalTestdataInstances[rowThatWasClickedOn]
-		fmt.Println("RowData: " + rowData.String())
-		fmt.Println("")
+		//rowData := mt.testDataAndMetaData.originalTestdataInstances[rowThatWasClickedOn]
+
+		//currentTableDataPointerData := reflect.ValueOf(mt.currentTableDataPointer)
+		//rowData := reflect.Indirect(currentTableDataPointerData).Index(int(rowThatWasClickedOn - 1))
+		//fmt.Println("RowData: " + rowData.String())
+		//fmt.Println("")
 
 		mt.rowSelected = rowThatWasClickedOn
-		mt.uniqueRowSelected = rowData.GetUniqueId()
+		//mt.uniqueRowSelected = rowData.GetUniqueId()
+
+		mt.uniqueRowSelected = mt.getUniqueId(int(rowThatWasClickedOn))
 		mt.Update()
 	}
 }

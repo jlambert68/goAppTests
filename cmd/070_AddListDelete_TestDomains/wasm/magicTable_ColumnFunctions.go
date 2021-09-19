@@ -95,14 +95,31 @@ func (mt *MagicTable) MyOnColumnClickWrapper(columnNumberThatWasClicked int) app
 			mt.Update()
 			//magicManager.Update()
 			//TODO Fix for all tables that are supported
-			// Update selected row
-			for rowCounter, i := range mt.testDataAndMetaData.originalTestdataInstances {
 
-				// Check if selected row
-				if i.UniqueId == mt.uniqueRowSelected {
+			// Update selected row
+			currentTableDataPointerData := reflect.ValueOf(mt.currentTableDataPointer)
+			numberOfRowsInTable := reflect.Indirect(currentTableDataPointerData).Len()
+			//fmt.Println("numberOfRowsInTable:: ", numberOfRowsInTable)
+
+			// Loop over all data rows
+			for rowCounter := 1; rowCounter < numberOfRowsInTable+1; rowCounter++ {
+				uniqueId := mt.getUniqueId(rowCounter)
+
+				if uniqueId == mt.uniqueRowSelected {
 					mt.rowSelected = int64(rowCounter)
+
 				}
 			}
+			/*
+				for rowCounter, i := range mt.testDataAndMetaData.originalTestdataInstances {
+
+					// Check if selected row
+					if i.UniqueId == mt.uniqueRowSelected {
+						mt.rowSelected = int64(rowCounter)
+					}
+				}
+
+			*/
 
 		}
 	}
