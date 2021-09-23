@@ -63,6 +63,8 @@ func (server *Server) Search(ctx context.Context, in *api.SearchRequest) (*api.I
 		}
 	}
 
+	//forDebuggingSortData(instances)
+
 	return &api.Instances{Instances: instances}, nil
 }
 
