@@ -20,12 +20,13 @@ func (mt *MagicTable) UpdateColumnsNodes() error {
 	err = nil
 
 	mt.tableColumnNodes = []app.UI{}
-	for columnCounter, columnMetadataResponse := range mt.testDataAndMetaData.magicTableMetaData {
+	for _, columnMetadataResponse := range mt.testDataAndMetaData.magicTableMetaData {
 		// Check if column should be shown
+		fmt.Println("columnMetadataResponse ", columnMetadataResponse)
 		columnHeader := app.Th().
 			Scope("col").
-			Body(app.Text(columnMetadataResponse.GetColumnHeaderName() + mt.SetSortIconForTableHeader(columnCounter))).
-			OnClick(mt.MyOnColumnClickWrapper(columnCounter))
+			Body(app.Text(columnMetadataResponse.GetColumnHeaderName() + mt.SetSortIconForTableHeader(int(columnMetadataResponse.PresentationOrder)))).
+			OnClick(mt.MyOnColumnClickWrapper(int(columnMetadataResponse.PresentationOrder)))
 		shouldBeShown := columnMetadataResponse.GetShouldBeVisible()
 		if shouldBeShown == true {
 			mt.tableColumnNodes = append(mt.tableColumnNodes, columnHeader)
@@ -77,6 +78,8 @@ func (mt *MagicTable) UpdateRowNodes() error {
 			columnData = mt.formatColumnData(rowCounter, columnName)
 
 			//fmt.Println("columnName - columnData:: ", columnName, columnData)
+
+			fmt.Println("mt.getUniqueId(rowCounter)", mt.getUniqueId(rowCounter))
 
 			// Only retrieve UniqueId once per row
 			if uniqueId == -1 {

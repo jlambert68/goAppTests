@@ -9,13 +9,12 @@ func (mt *MagicTable) CreateEditBoxes() ([]app.UI, error) {
 	var err error
 	err = nil
 
-	// Check if they should be enabled or not
-	areNewUpdateDeleteTextBoxesEnabled := mt.areNewUpdateDeleteTextBoxesDisabled()
-
 	// Dynamically create column headers for MagicTable
 	editRows := []app.UI{}
 	for _, columnMetadataResponse := range mt.testDataAndMetaData.magicTableMetaData {
 
+		// Check if they should be enabled or not
+		areNewUpdateDeleteTextBoxesEnabled := mt.areNewUpdateDeleteTextBoxesDisabled(columnMetadataResponse)
 		//rowLabel := app.Label().
 		//	Text(columnMetadataResponse.GetColumnHeaderName())
 		rowLabel := columnMetadataResponse.GetColumnHeaderName()

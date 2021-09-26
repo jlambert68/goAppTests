@@ -243,12 +243,23 @@ func (mt *MagicTable) removeIndexFromMagicTable(s []alertMessageStruct, index in
 
 func (mt *MagicTable) GetRowTextBoxValueForEdit(columnDataName string) string {
 
+	fmt.Println("GetRowTextBoxValueForEdit(columnDataName string) string {", columnDataName)
+
 	var returnValue string
 
 	switch mt.tableState {
 
 	case TableState_New:
-		returnValue = ""
+		switch columnDataName {
+		case "Guid":
+			returnValue = GenerateGuid()
+
+		case "UpdateTimeStamp":
+			returnValue = "Mitt klockslag"
+
+		default:
+			returnValue = ""
+		}
 
 	case TableState_Edit,
 		TableState_Delete:
@@ -277,29 +288,34 @@ func (mt *MagicTable) StateCheckToShowBaseButtons() bool {
 	return false
 }
 
-func (mt *MagicTable) SetSortIconForTableHeader(columnCounter int) string {
+func (mt *MagicTable) SetSortIconForTableHeader(presentationOrder int) string {
 	var returnMessage string
-	//fmt.Println("mt.columnToSortOn: ", mt.columnToSortOn, mt.testDataAndMetaData.magicTableMetaData[columnCounter].String(), mt.testDataAndMetaData.magicTableMetaData[columnCounter].Sortable)
+	//fmt.Println("mt.columnToSortOn: ", mt.columnToSortOn, mt.testDataAndMetaData.magicTableMetaData[presentationOrder].String(), mt.testDataAndMetaData.magicTableMetaData[presentationOrder].Sortable)
 
 	// Only Set icon on correct Header
 
-	if mt.testDataAndMetaData.magicTableMetaData[columnCounter].Sortable == true {
-		// Column is sortable
-		if columnCounter == mt.columnToSortOn && firstTimeForSorting == false {
-			if mt.columnSortOrderIsAscending {
-				returnMessage = "↑"
+	for iColumnCounter, magicTableMetaData := range mt.testDataAndMetaData.magicTableMetaData {
+
+		if presentationOrder == int(mt.testDataAndMetaData.magicTableMetaData[iColumnCounter].PresentationOrder) {
+
+			if magicTableMetaData.Sortable == true {
+				// Column is sortable
+				if presentationOrder == mt.columnToSortOn && firstTimeForSorting == false {
+					if mt.columnSortOrderIsAscending {
+						returnMessage = "↑"
+					} else {
+						returnMessage = "↓"
+					}
+				} else {
+
+					returnMessage = "↑↓"
+				}
 			} else {
-				returnMessage = "↓"
+				// Column is not sortable
+				returnMessage = ""
 			}
-		} else {
-
-			returnMessage = "↑↓"
 		}
-	} else {
-		// Column is not sortable
-		returnMessage = ""
 	}
-
 	return returnMessage
 }
 
@@ -399,12 +415,14 @@ func (mt *MagicTable) OnTextboxDblClickappWrapper(buttonId string) app.EventHand
 	}
 }
 
-func (mt *MagicTable) areNewUpdateDeleteTextBoxesDisabled() (textBoxesAreEnabled bool) {
+func (mt *MagicTable) areNewUpdateDeleteTextBoxesDisabled(columnMetadata *api.MagicTableColumnMetadata) (textBoxesAreEnabled bool) {
 
 	switch mt.tableState {
-	case TableState_New,
-		TableState_Edit:
-		textBoxesAreEnabled = false
+	case TableState_New:
+		textBoxesAreEnabled = !columnMetadata.NewIsEditable
+
+	case TableState_Edit:
+		textBoxesAreEnabled = !columnMetadata.UpdateIsEditable
 
 	default:
 		textBoxesAreEnabled = true

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"runtime"
 )
 
@@ -27,4 +28,13 @@ func (mt *MagicTable) trace(printToStandardOutput bool) string {
 	}
 
 	return returnMessage
+}
+
+// Generates a guid in string format
+func GenerateGuid() string {
+
+	newGuid, _ := uuid.NewUUID()
+
+	return newGuid.String()
+
 }

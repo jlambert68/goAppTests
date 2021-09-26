@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-func (mt *MagicTable) MyOnColumnClickWrapper(columnNumberThatWasClicked int) app.EventHandler {
+func (mt *MagicTable) MyOnColumnClickWrapper(sortOrderThatWasClicked int) app.EventHandler {
 	return func(ctx app.Context, e app.Event) {
 
 		mt.logger.WithFields(logrus.Fields{
@@ -28,41 +28,57 @@ func (mt *MagicTable) MyOnColumnClickWrapper(columnNumberThatWasClicked int) app
 			return
 		}
 
-		fmt.Println("MyOnColumnClickWrapper is called:::::: " + strconv.Itoa(columnNumberThatWasClicked))
+		fmt.Println("MyOnColumnClickWrapper is called:::::: " + strconv.Itoa(sortOrderThatWasClicked))
 		fmt.Println("")
+		currentTableDataPointerData := reflect.ValueOf(mt.currentTableDataPointer)
+		numberOfRowsInTable := reflect.Indirect(currentTableDataPointerData).Len()
+		for rowCounter := 1; rowCounter < numberOfRowsInTable+1; rowCounter++ {
+			uniqueId := mt.getUniqueId(rowCounter)
+			fmt.Println("uniqueId", uniqueId)
+		}
+		fmt.Println("mt.columnSortOrderIsAscending before change direction", mt.columnSortOrderIsAscending)
 
 		// Only sort if column is sortable
-		if mt.testDataAndMetaData.magicTableMetaData[columnNumberThatWasClicked].Sortable == true {
+		for iColumnCounter, magicTableMetaData := range mt.testDataAndMetaData.magicTableMetaData {
 
-			// Check if table for sorted before
-			if firstTimeForSorting == true {
-				firstTimeForSorting = false
+			if sortOrderThatWasClicked == int(mt.testDataAndMetaData.magicTableMetaData[iColumnCounter].PresentationOrder) {
 
-				// First time
-				mt.columnToSortOn = columnNumberThatWasClicked
-				mt.columnSortOrderIsAscending = true
+				if magicTableMetaData.Sortable == true {
 
-				// Not the first time
-			} else {
-				// If the same column was clicked then invert sort order for column
-				if mt.columnToSortOn == columnNumberThatWasClicked {
-					mt.columnSortOrderIsAscending = !mt.columnSortOrderIsAscending
-				} else {
-					// New column to sort on
-					mt.columnToSortOn = columnNumberThatWasClicked
-					mt.columnSortOrderIsAscending = true
+					// Check if table for sorted before
+					if firstTimeForSorting == true {
+						firstTimeForSorting = false
+
+						// First time
+						mt.columnToSortOn = iColumnCounter
+						mt.columnSortOrderIsAscending = true
+
+						// Not the first time
+					} else {
+						// If the same column was clicked then invert sort order for column
+						if mt.columnToSortOn == iColumnCounter {
+							mt.columnSortOrderIsAscending = !mt.columnSortOrderIsAscending
+						} else {
+							// New column to sort on
+							mt.columnToSortOn = iColumnCounter
+							mt.columnSortOrderIsAscending = true
+						}
+					}
 				}
 			}
+			fmt.Println("mt.columnSortOrderIsAscending after change direction", mt.columnSortOrderIsAscending)
 
 			// Sort the current data
 			switch mt.tableTypeGuid {
 
 			// Original Test table
 			case "51253aba-41a9-42ef-b5f1-d8d1d7116b47":
+				fmt.Println("sort.SliceStable(mt.testDataAndMetaData.originalTestdataInstances, mt.sliceSorter)")
 				sort.SliceStable(mt.testDataAndMetaData.originalTestdataInstances, mt.sliceSorter)
 
 				// TestDomains
 			case "8acacaaf-676e-4b36-abe6-c5310822ade1":
+				fmt.Println("sort.SliceStable(mt.testDataAndMetaData.testDomains, mt.sliceSorter)")
 				sort.SliceStable(mt.testDataAndMetaData.testDomains, mt.sliceSorter)
 
 			default:
@@ -73,8 +89,6 @@ func (mt *MagicTable) MyOnColumnClickWrapper(columnNumberThatWasClicked int) app
 
 			}
 
-			mt.Update()
-
 			// Update selected row
 			currentTableDataPointerData := reflect.ValueOf(mt.currentTableDataPointer)
 			numberOfRowsInTable := reflect.Indirect(currentTableDataPointerData).Len()
@@ -84,19 +98,25 @@ func (mt *MagicTable) MyOnColumnClickWrapper(columnNumberThatWasClicked int) app
 			for rowCounter := 1; rowCounter < numberOfRowsInTable+1; rowCounter++ {
 				uniqueId := mt.getUniqueId(rowCounter)
 
+				fmt.Println("uniqueId", uniqueId)
+
 				if uniqueId == mt.uniqueRowSelected {
 					mt.rowSelected = int64(rowCounter)
 
 				}
 			}
+			fmt.Println("mt.columnSortOrderIsAscending after sort", mt.columnSortOrderIsAscending)
+
+			mt.Update()
 		}
 	}
 }
 
 // Function that is passed into "sort.Slicestable" to be able to sort
 func (mt *MagicTable) sliceSorter(i, j int) bool {
+	// j= i -1
 
-	var compareResult bool
+	var compareResult bool = false
 	var value1 reflect.Value
 	var value2 reflect.Value
 
@@ -125,20 +145,41 @@ func (mt *MagicTable) sliceSorter(i, j int) bool {
 	//value1 := getAttr(reflect.Indirect(currentTableData).Index(i-1), fieldsToExtract)
 	//value2 := getAttr(reflect.Indirect(currentTableData).Index(j-1), fieldsToExtract)
 
+	fmt.Println("mt.testDataAndMetaData.magicTableMetaData[mt.columnToSortOn].ColumnDataType", mt.testDataAndMetaData.magicTableMetaData[mt.columnToSortOn].ColumnDataType)
+
 	switch mt.testDataAndMetaData.magicTableMetaData[mt.columnToSortOn].ColumnDataType {
 	case api.MagicTableColumnDataType_String:
 		compareResult = value1.String() < value2.String()
+		fmt.Println("case api.MagicTableColumnDataType_String:", value1, "<", value2, compareResult)
+
 	case api.MagicTableColumnDataType_Float:
 		compareResult = value1.Float() < value2.Float()
+		fmt.Println("case api.MagicTableColumnDataType_Float:", value1, "<", value2, compareResult)
+
+	case api.MagicTableColumnDataType_Int:
+		compareResult = value1.Int() < value2.Int()
+		fmt.Println("case api.MagicTableColumnDataType_Int:", value1, "<", value2, compareResult)
+
+	case api.MagicTableColumnDataType_Bool:
+		compareResult = value1.Bool() == value2.Bool()
+		fmt.Println("case api.MagicTableColumnDataType_Bool:", value1, "<", value2, compareResult)
+
+	default:
+		mt.logger.WithFields(logrus.Fields{
+			"Id": "dbb4e088-f633-4588-8c40-1f7111fd8783",
+			"mt.testDataAndMetaData.magicTableMetaData[mt.columnToSortOn].ColumnDataType": mt.testDataAndMetaData.magicTableMetaData[mt.columnToSortOn].ColumnDataType,
+		}).Panic("Unknown column type to sort on")
 	}
 
-	return xnor(mt.columnSortOrderIsAscending, compareResult)
+	xnorResults := xor(mt.columnSortOrderIsAscending, compareResult)
+	fmt.Println("value1, value2, mt.columnSortOrderIsAscending, compareResult, xnorResults:: ", value1, value2, mt.columnSortOrderIsAscending, compareResult, xnorResults)
 
+	return xnorResults
 }
 
 //https://play.golang.org/p/pxj_gCnvF1J
 func getAttr(obj interface{}, fieldName string) reflect.Value {
-	fmt.Println("getAttr", obj, fieldName)
+	//fmt.Println("getAttr", obj, fieldName)
 	pointToStruct := reflect.ValueOf(obj) // addressable
 	curStruct := pointToStruct.Elem()
 	if curStruct.Kind() != reflect.Struct {
@@ -152,6 +193,9 @@ func getAttr(obj interface{}, fieldName string) reflect.Value {
 }
 
 // XNOR function
-func xnor(a, b bool) bool {
-	return !((a || b) && (!a || !b))
+func xor(a, b bool) bool {
+	return ((a && b) || (!a && !b)) //XNOR
+	//return ((a || b) && (!a || !b)) //XOR
+	//return ((a && b) || (!a && b))
+
 }

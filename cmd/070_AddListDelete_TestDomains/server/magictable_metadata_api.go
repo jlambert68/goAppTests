@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"github.com/sirupsen/logrus"
 	"goAppTest1/cmd/070_AddListDelete_TestDomains/protos/api"
 )
@@ -31,7 +30,11 @@ func (server *Server) GetMagicTableMetadata(ctx context.Context, in *api.MagicTa
 
 	magicTableColumnsMetadataFromDB, err := server.listMagicTableColumnMetadata(in.TableTypeGuid)
 	if err != nil {
-		fmt.Println(err.Error())
+		server.logger.WithFields(logrus.Fields{
+			"Id":          "becb4612-2f92-433d-9553-b64eae6af3f5",
+			"err.Error()": err.Error(),
+		}).Error("Something went wrong when calling database")
+
 		return magicTableMetadataRespons, err
 	}
 
@@ -46,6 +49,9 @@ func (server *Server) GetMagicTableMetadata(ctx context.Context, in *api.MagicTa
 			Sortable:               magicTableColumnsMetadata.Sortable,
 			FormatPresentationType: magicTableColumnsMetadata.FormatPresentationType, //api.MagicTableColumnPresentationType_Simple,
 			ShouldBeVisible:        magicTableColumnsMetadata.ShouldBeVisible,
+			PresentationOrder:      magicTableColumnsMetadata.PresentationOrder,
+			UpdateIsEditable:       magicTableColumnsMetadata.UpdateIsEditable,
+			NewIsEditable:          magicTableColumnsMetadata.NewIsEditable,
 		}
 
 		//fmt.Println(magicTableColumnMetadata)

@@ -21,7 +21,8 @@ func (server *Server) listMagicTableColumnMetadata(tableTypeGuid string) ([]api.
 	}()
 
 	sqlToExecute := ""
-	sqlToExecute = sqlToExecute + "SELECT magictable_metadata.\"ColumnHeaderName\", magictable_metadata.\"ColumnDataName\", magictable_metadata.\"ColumnDataType\", magictable_metadata.\"Sortable\", magictable_metadata.\"FormatPresentationType\", magictable_metadata.\"ShouldBeVisible\" "
+	sqlToExecute = sqlToExecute + "SELECT magictable_metadata.\"ColumnHeaderName\", magictable_metadata.\"ColumnDataName\", magictable_metadata.\"ColumnDataType\", magictable_metadata.\"Sortable\", magictable_metadata.\"FormatPresentationType\", magictable_metadata.\"ShouldBeVisible\", magictable_metadata.\"PresentationOrder\""
+	sqlToExecute = sqlToExecute + ", magictable_metadata.\"UpdateIsEditable\", magictable_metadata.\"NewIsEditable\" "
 	sqlToExecute = sqlToExecute + "FROM magictable_metadata, tabletoedit "
 	sqlToExecute = sqlToExecute + "WHERE magictable_metadata.\"TableId\" = tabletoedit.\"id\" "
 	sqlToExecute = sqlToExecute + "AND "
@@ -35,7 +36,9 @@ func (server *Server) listMagicTableColumnMetadata(tableTypeGuid string) ([]api.
 	var returnMessage []api.MagicTableColumnMetadata
 
 	for rows.Next() {
-		err := rows.Scan(&magicTableColumnMetadata.ColumnHeaderName, &magicTableColumnMetadata.ColumnDataName, &magicTableColumnMetadata.ColumnDataType, &magicTableColumnMetadata.Sortable, &magicTableColumnMetadata.FormatPresentationType, &magicTableColumnMetadata.ShouldBeVisible)
+		err := rows.Scan(&magicTableColumnMetadata.ColumnHeaderName, &magicTableColumnMetadata.ColumnDataName, &magicTableColumnMetadata.ColumnDataType,
+			&magicTableColumnMetadata.Sortable, &magicTableColumnMetadata.FormatPresentationType, &magicTableColumnMetadata.ShouldBeVisible,
+			&magicTableColumnMetadata.PresentationOrder, &magicTableColumnMetadata.UpdateIsEditable, &magicTableColumnMetadata.NewIsEditable)
 		if err != nil {
 			return returnMessage, err
 		}

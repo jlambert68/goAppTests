@@ -47,6 +47,9 @@ message MagicTableColumnMetadata {
   bool Sortable = 4;
   MagicTableColumnPresentationType FormatPresentationType = 5;
   bool ShouldBeVisible  = 6;
+  int64 PresentationOrder = 7;
+  bool UpdateIsEditable = 8;
+  bool NewIsEditable = 9;
 
 }
 
@@ -60,6 +63,7 @@ enum MagicTableColumnDataType {
   String = 0;
   Int = 1;
   Float = 2;
+  Bool = 3;
 }
 
 enum MagicTableColumnPresentationType {
