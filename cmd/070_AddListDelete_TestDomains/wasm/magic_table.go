@@ -254,7 +254,7 @@ func (mt *MagicTable) GetRowTextBoxValueForEdit(columnDataName string) string {
 		case "Guid":
 			returnValue = GenerateGuid()
 
-		case "UpdateTimeStamp":
+		case "UpdateTimestamp":
 			returnValue = "Mitt klockslag"
 
 		default:

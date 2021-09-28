@@ -108,6 +108,13 @@ func (server *Server) SaveNewOrUpdateTestDomain(ctx context.Context, in *api.New
 			ResponseStatus:  true,
 			ResponseMessage: "Message was saved in database",
 		}
+		returnMessage = &api.NewOrUpdateTestDomainResponse{
+			Id:              0,
+			Guid:            "",
+			UpdateTimestamp: "",
+			ResponseStatus:  true,
+			ResponseMessage: "Message was saved in database",
+		}
 
 	case api.NewOrUpdateTestDomainUpdateType_UpdateTestDomain:
 		returnMessage = &api.NewOrUpdateTestDomainResponse{
