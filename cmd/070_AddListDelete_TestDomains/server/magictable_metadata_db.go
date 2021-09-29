@@ -20,14 +20,16 @@ func (server *Server) listMagicTableColumnMetadata(tableTypeGuid string) ([]api.
 		}).Debug("Exiting: listMagicTableColumnMetadata()")
 	}()
 
-	sqlToExecute := ""
-	sqlToExecute = sqlToExecute + "SELECT magictable_metadata.\"ColumnHeaderName\", magictable_metadata.\"ColumnDataName\", magictable_metadata.\"ColumnDataType\", magictable_metadata.\"Sortable\", magictable_metadata.\"FormatPresentationType\", magictable_metadata.\"ShouldBeVisible\", magictable_metadata.\"PresentationOrder\""
-	sqlToExecute = sqlToExecute + ", magictable_metadata.\"UpdateIsEditable\", magictable_metadata.\"NewIsEditable\" "
-	sqlToExecute = sqlToExecute + "FROM magictable_metadata, tabletoedit "
-	sqlToExecute = sqlToExecute + "WHERE magictable_metadata.\"TableId\" = tabletoedit.\"id\" "
-	sqlToExecute = sqlToExecute + "AND "
-	sqlToExecute = sqlToExecute + "tabletoedit.guid = '" + tableTypeGuid + "' "
-	sqlToExecute = sqlToExecute + "ORDER BY magictable_metadata.\"PresentationOrder\""
+	sqlToExecute := "SELECT * FROM sp_list_magictable_metadata('" + tableTypeGuid + "')"
+	/*
+		sqlToExecute = sqlToExecute + "SELECT magictable_metadata.\"ColumnHeaderName\", magictable_metadata.\"ColumnDataName\", magictable_metadata.\"ColumnDataType\", magictable_metadata.\"Sortable\", magictable_metadata.\"FormatPresentationType\", magictable_metadata.\"ShouldBeVisible\", magictable_metadata.\"PresentationOrder\""
+		sqlToExecute = sqlToExecute + ", magictable_metadata.\"UpdateIsEditable\", magictable_metadata.\"NewIsEditable\" "
+		sqlToExecute = sqlToExecute + "FROM magictable_metadata, tabletoedit "
+		sqlToExecute = sqlToExecute + "WHERE magictable_metadata.\"TableId\" = tabletoedit.\"id\" "
+		sqlToExecute = sqlToExecute + "AND "
+		sqlToExecute = sqlToExecute + "tabletoedit.guid = '" + tableTypeGuid + "' "
+		sqlToExecute = sqlToExecute + "ORDER BY magictable_metadata.\"PresentationOrder\""
+	*/
 
 	//fmt.Println(sqlToExecute)
 	rows, _ := DbPool.Query(context.Background(), sqlToExecute)
