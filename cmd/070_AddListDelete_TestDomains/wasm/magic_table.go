@@ -262,14 +262,17 @@ func (mt *MagicTable) GetRowTextBoxValueForEdit(columnDataName string) string {
 		}
 
 	case TableState_Edit,
-		TableState_Delete:
+		TableState_Delete,
+		TableState_Edit_Save:
 
 		currentTableDataPointerData := reflect.ValueOf(mt.currentTableDataPointer)
 		rowData := reflect.Indirect(currentTableDataPointerData).Index(int(mt.rowSelected - 1))
+		//fmt.Println("rowData ", rowData)
 
 		f := reflect.Indirect(rowData).FieldByName(columnDataName)
 
 		returnValue = fmt.Sprintf("%v", f)
+		fmt.Println("columnDataName, returnValue", columnDataName, returnValue)
 
 	default:
 		returnValue = ""

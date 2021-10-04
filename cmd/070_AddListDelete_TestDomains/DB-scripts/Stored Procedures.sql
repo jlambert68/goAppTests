@@ -71,5 +71,87 @@ alter function sp_list_magictable_metadata() owner to testuser;
 
 
 -- ********************************************************************
--- Lxxxx
+-- Add a New TestDomain or Update an Existing. Either way, a new row is created.
 
+create function sp_insert_new_or_updated_testdomain(
+    in_guid character varying,
+    in_name character varying,
+    in_description character varying,
+    in_ready_for_use boolean,
+    in_activated boolean,
+    in_deleted boolean,
+    in_update_timestamp timestamptz)
+
+-- Returns the newly created or updated TestDomain
+    RETURNS TABLE
+            (
+                id               integer,
+                guid             character varying,
+                name             character varying,
+                description      character varying,
+                ready_for_use    boolean,
+                activated        boolean,
+                deleted          boolean,
+                update_timestamp timestamptz
+            )
+
+
+    language plpgsql
+as
+$$
+
+
+begin
+    -- Insert New or Updated TestDomain as new row
+    insert into testdomains(guid,
+                            name,
+                            description,
+                            ready_for_use,
+                            activated,
+                            deleted,
+                            update_timestamp)
+    values (in_guid,
+            in_name,
+            in_description,
+            in_ready_for_use,
+            in_activated,
+            in_deleted,
+            in_update_timestamp);
+    commit;
+
+    -- Retrieve the newly created or updated TestDomain
+    return query
+        SELECT  (td.id,
+                 td.guid,
+                 td.name,
+                 td.description,
+                 td.ready_for_use,
+                 td.activated,
+                 td.deleted,
+                 td.update_timestamp)
+
+        FROM testdomains td
+        WHERE td.guid = in_guid
+        ORDER BY td.id DESC
+        LIMIT 1;
+
+
+end;
+$$;
+
+alter function sp_insert_new_or_updated_testdomain(
+    varchar,
+    varchar,
+    varchar,
+    boolean,
+    boolean,
+    boolean,
+    timestamptz) owner to testuser;
+
+
+
+-- ********************************************************************
+
+
+-- ********************************************************************
+-- Lxxxx

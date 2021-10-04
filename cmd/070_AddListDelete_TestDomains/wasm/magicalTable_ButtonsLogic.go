@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/maxence-charriere/go-app/v8/pkg/app"
+	"goAppTest1/cmd/070_AddListDelete_TestDomains/protos/api"
 	"strconv"
 )
 
@@ -109,6 +110,8 @@ func (mt *MagicTable) onButtonClick(buttonThatWasClicked int) {
 
 	//fmt.Println("Button that was clicked: " + strconv.Itoa(buttonThatWasClicked))
 
+	keyValuePar := make(map[string]interface{})
+
 	switch buttonThatWasClicked {
 	case NewButton:
 		//fmt.Println("onButtonClickWrapper is called: 'NewButton'")
@@ -117,6 +120,7 @@ func (mt *MagicTable) onButtonClick(buttonThatWasClicked int) {
 	case EditButton:
 		//fmt.Println("onButtonClickWrapper is called: 'EditButton'")
 		mt.tableState = TableState_Edit
+
 		for _, columnMetadataResponse := range mt.testDataAndMetaData.magicTableMetaData {
 
 			columnDataName := columnMetadataResponse.GetColumnDataName()
@@ -124,6 +128,8 @@ func (mt *MagicTable) onButtonClick(buttonThatWasClicked int) {
 			elem := app.Window().
 				GetElementByID(columnDataName)
 			fmt.Println(columnDataName, elem.IsNull())
+			//rowTextBoxValue := mt.GetRowTextBoxValueForEdit(columnDataName)
+			//keyValuePar[columnDataName] = rowTextBoxValue
 
 		}
 
@@ -144,6 +150,37 @@ func (mt *MagicTable) onButtonClick(buttonThatWasClicked int) {
 		case TableState_Edit:
 			mt.tableState = TableState_Edit_Save
 			//fmt.Println("Current State: 'TableState_Edit_Save'")
+			var newOrUpdateTestDomainUpdateType api.NewOrUpdateTestDomainUpdateType
+			var rowTextBoxValue app.Value
+
+			fmt.Println("mt.testDataAndMetaData.magicTableMetaData - ", mt.testDataAndMetaData.magicTableMetaData)
+			for _, columnMetadataResponse := range mt.testDataAndMetaData.magicTableMetaData {
+
+				columnDataName := columnMetadataResponse.GetColumnDataName()
+				//rowTextBoxValue := mt.GetRowTextBoxValueForEdit(columnDataName)
+				elem := app.Window().
+					GetElementByID(columnDataName)
+
+				//fmt.Println(columnDataName, elem.IsNull())
+				//fmt.Println(columnDataName, elem.Get("value"))
+				if columnMetadataResponse.GetShouldBeVisible() == true {
+					rowTextBoxValue = elem.Get("value")
+				} else {
+					rowTextBoxValue = app.ValueOf(mt.GetRowTextBoxValueForEdit(columnDataName))
+				}
+
+				//fmt.Println("columnDataName - rowTextBoxValue", columnDataName, rowTextBoxValue)
+				//rowTextBoxValue ? elem.IsNull()
+
+				keyValuePar[columnDataName] = rowTextBoxValue
+			}
+
+			fmt.Println("keyValuePar: ", keyValuePar)
+
+			newOrUpdateTestDomainUpdateType = api.NewOrUpdateTestDomainUpdateType_UpdateTestDomain
+
+			mt.SaveNewOrUpdateTestDomain(keyValuePar, newOrUpdateTestDomainUpdateType)
+			//fmt.Println("SIMULATE::: CALL DB",newOrUpdateTestDomainUpdateType)
 
 			mt.tableState = TableState_List
 			//fmt.Println("Current State: 'TableState_List'")

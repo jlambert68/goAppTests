@@ -94,44 +94,75 @@ func (server *Server) ListTestDomains(ctx context.Context, in *api.EmptyParamete
 	*/
 }
 
-func (server *Server) SaveNewOrUpdateTestDomain(ctx context.Context, in *api.NewOrUpdateTestDomainRequest) (*api.NewOrUpdateTestDomainResponse, error) {
+func (server *Server) SaveNewOrUpdateTestDomain(ctx context.Context, newOrUpdateTestDomainRequest *api.NewOrUpdateTestDomainRequest) (*api.NewOrUpdateTestDomainResponse, error) {
+
+	server.logger.WithFields(logrus.Fields{
+		"Id":    "fd690fdb-69b4-4fae-887f-03fb10d40db7",
+		"Trace": server.trace(false),
+	}).Debug("Entering: SaveNewOrUpdateTestDomain()")
+
+	defer func() {
+		server.logger.WithFields(logrus.Fields{
+			"Id":    "c987dbef-c5fb-4e55-9de0-0f97ab51366d",
+			"Trace": server.trace(false),
+		}).Debug("Exiting: SaveNewOrUpdateTestDomain()")
+	}()
 
 	var err error
 	var returnMessage *api.NewOrUpdateTestDomainResponse
 	err = nil
 
-	switch in.NewOrUpdate {
+	switch newOrUpdateTestDomainRequest.NewOrUpdate {
 	case api.NewOrUpdateTestDomainUpdateType_NewTestDomain:
+
 		returnMessage = &api.NewOrUpdateTestDomainResponse{
-			Id:              99,
-			Guid:            "65555555",
-			ResponseStatus:  true,
-			ResponseMessage: "Message was saved in database",
-		}
-		returnMessage = &api.NewOrUpdateTestDomainResponse{
-			Id:              0,
-			Guid:            "",
-			UpdateTimestamp: "",
-			ResponseStatus:  true,
-			ResponseMessage: "Message was saved in database",
+			NewOrUpdateTestDomainData: nil,
+			ResponseStatus:            true,
+			ResponseMessage:           "Message was saved newOrUpdateTestDomainRequest database",
 		}
 
 	case api.NewOrUpdateTestDomainUpdateType_UpdateTestDomain:
 		returnMessage = &api.NewOrUpdateTestDomainResponse{
-			Id:              in.NewOrUpdateTestDomainData.Id,
-			Guid:            in.NewOrUpdateTestDomainData.Guid,
-			ResponseStatus:  true,
-			ResponseMessage: "Message was updated in database",
+			NewOrUpdateTestDomainData: nil,
+			ResponseStatus:            true,
+			ResponseMessage:           "Message was updated newOrUpdateTestDomainRequest database",
 		}
 
 	default:
 		returnMessage = &api.NewOrUpdateTestDomainResponse{
-			Id:              in.NewOrUpdateTestDomainData.Id,
-			Guid:            in.NewOrUpdateTestDomainData.Guid,
-			ResponseStatus:  false,
-			ResponseMessage: "Unknown api.NewOrUpdateTestDomainUpdateType",
+			NewOrUpdateTestDomainData: nil,
+			ResponseStatus:            false,
+			ResponseMessage:           "Unknown api.NewOrUpdateTestDomainUpdateType",
 		}
 	}
+
+	newOrUpdateTestDomainData, err := server.SaveNewOrUpdateTestDomainDB(newOrUpdateTestDomainRequest)
+	if err != nil {
+		returnMessage = &api.NewOrUpdateTestDomainResponse{
+			NewOrUpdateTestDomainData: nil,
+			ResponseStatus:            false,
+			ResponseMessage:           err.Error(),
+		}
+
+		server.logger.WithFields(logrus.Fields{
+			"Id":          "9ff78f70-8237-4b0f-97c0-e197f6ef4149",
+			"err.Error()": err.Error(),
+		}).Error("Error when calling database")
+
+		return returnMessage, nil
+	}
+
+	returnMessage = &api.NewOrUpdateTestDomainResponse{
+		NewOrUpdateTestDomainData: &newOrUpdateTestDomainData,
+		ResponseStatus:            true,
+		ResponseMessage:           "Message was updated newOrUpdateTestDomainRequest database",
+	}
+
+	server.logger.WithFields(logrus.Fields{
+		"Id":                     "3c4b328f-6923-49eb-80a0-9c83cf917f28",
+		"Message to Save/Update": newOrUpdateTestDomainRequest,
+		"New Message":            newOrUpdateTestDomainData,
+	}).Error("Message was Saved/Updated in database")
 
 	return returnMessage, err
 }

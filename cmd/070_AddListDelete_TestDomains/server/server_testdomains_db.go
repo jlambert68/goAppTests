@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"goAppTest1/cmd/070_AddListDelete_TestDomains/protos/api"
+	"strconv"
 	"time"
 )
 
@@ -40,7 +41,15 @@ func (server *Server) ListTestDomainsInDB() ([]api.TestDomainForListingMessage, 
 
 	for rows.Next() {
 
-		err := rows.Scan(&testDomainForListingMessage.Id, &testDomainForListingMessage.Guid, &testDomainForListingMessage.Name, &testDomainForListingMessage.Description, &testDomainForListingMessage.ReadyForUse, &testDomainForListingMessage.Activated, &testDomainForListingMessage.Deleted, myTimeStamp)
+		err := rows.Scan(
+			&testDomainForListingMessage.Id,
+			&testDomainForListingMessage.Guid,
+			&testDomainForListingMessage.Name,
+			&testDomainForListingMessage.Description,
+			&testDomainForListingMessage.ReadyForUse,
+			&testDomainForListingMessage.Activated,
+			&testDomainForListingMessage.Deleted,
+			myTimeStamp)
 		if err != nil {
 			return returnMessage, err
 		}
@@ -53,7 +62,7 @@ func (server *Server) ListTestDomainsInDB() ([]api.TestDomainForListingMessage, 
 	return returnMessage, rows.Err()
 }
 
-func (server *Server) SaveNewOrUpdateTestDomainDB(newOrUpdateTestDomainRequest *api.NewOrUpdateTestDomainRequest) (api.NewOrUpdateTestDomainResponse, error) {
+func (server *Server) SaveNewOrUpdateTestDomainDB(newOrUpdateTestDomainRequest *api.NewOrUpdateTestDomainRequest) (api.NewOrUpdateTestDomainData, error) {
 
 	server.logger.WithFields(logrus.Fields{
 		"Id":    "55117ded-c1cf-4a3c-88f6-00660881be93",
@@ -70,11 +79,16 @@ func (server *Server) SaveNewOrUpdateTestDomainDB(newOrUpdateTestDomainRequest *
 	var currentTimeStamp time.Time
 	currentTimeStamp = time.Now()
 
-	sqlToExecute := ``
-	sqlToExecute = sqlToExecute + `INSERT INTO `
-	sqlToExecute = sqlToExecute + `"testdomains"("guid", "name", "description", "ready_for_use", "activated", "deleted", "update_timestamp"`
+	sqlToExecute := "Select * From sp_insert_new_or_updated_testdomain("
+	sqlToExecute = sqlToExecute + "'" + newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Guid + "', "
+	sqlToExecute = sqlToExecute + "'" + newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Name + "', "
+	sqlToExecute = sqlToExecute + "'" + newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Description + "', "
+	sqlToExecute = sqlToExecute + "'" + strconv.FormatBool(newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.ReadyForUse) + "', "
+	sqlToExecute = sqlToExecute + "'" + strconv.FormatBool(newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Activated) + "', "
+	sqlToExecute = sqlToExecute + "'" + strconv.FormatBool(newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Deleted) + "', "
+	sqlToExecute = sqlToExecute + "'" + newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.UpdateTimestamp + "') "
 
-	result, err := DbPool.Exec(context.Background(), sqlToExecute,
+	rows, err := DbPool.Query(context.Background(), sqlToExecute,
 		newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Guid,
 		newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Name,
 		newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Description,
@@ -84,32 +98,29 @@ func (server *Server) SaveNewOrUpdateTestDomainDB(newOrUpdateTestDomainRequest *
 		currentTimeStamp,
 	)
 
-	fmt.Println("result::::::::::::::::::::::::::::::", result)
-
 	if err != nil {
 		server.logger.WithFields(logrus.Fields{
-			"Id": "4c5db158-3142-454f-ac6a-69b7498becd0",
-		}).Error("Entering: SaveNewOrUpdateTestDomainDB()")
+			"Id":                           "30d3e05e-8ef5-42b6-bee8-bc0857966901",
+			"newOrUpdateTestDomainRequest": newOrUpdateTestDomainRequest,
+		}).Error("Something went wrong when creating new or updating TestDomain")
 	}
-	/*
-		var testDomainForListingMessage api.TestDomainForListingMessage
-		var returnMessage []api.TestDomainForListingMessage
-		var myTimeStamp interface{} //time.Time
 
-		for rows.Next() {
+	var newOrUpdateTestDomainData api.NewOrUpdateTestDomainData
 
-			err := rows.Scan(&testDomainForListingMessage.Id, &testDomainForListingMessage.Guid, &testDomainForListingMessage.Name, &testDomainForListingMessage.Description, &testDomainForListingMessage.ReadyForUse, &testDomainForListingMessage.Activated, &testDomainForListingMessage.Deleted, myTimeStamp)
-			if err != nil {
-				return returnMessage, err
-			}
-			testDomainForListingMessage.UpdateTimestamp = fmt.Sprintf("%v", myTimeStamp) // myTimeStamp.String()
-			returnMessage = append(returnMessage, testDomainForListingMessage)
+	var myTimeStamp interface{} //time.Time
 
-			//fmt.Println("XXXXXXXXX testDomainForListingMessage: ", testDomainForListingMessage)
+	newOrUpdateTestDomainData = api.NewOrUpdateTestDomainData{}
+
+	for rows.Next() {
+
+		err = rows.Scan(&newOrUpdateTestDomainData.Id, &newOrUpdateTestDomainData.Guid, &newOrUpdateTestDomainData.Name, &newOrUpdateTestDomainData.Description, &newOrUpdateTestDomainData.ReadyForUse, &newOrUpdateTestDomainData.Activated, &newOrUpdateTestDomainData.Deleted, myTimeStamp)
+		if err != nil {
+			return newOrUpdateTestDomainData, err
 		}
+		newOrUpdateTestDomainData.UpdateTimestamp = fmt.Sprintf("%v", myTimeStamp) // myTimeStamp.String()
 
-		return returnMessage, rows.Err()
+		break
+	}
 
-	*/
-	return api.NewOrUpdateTestDomainResponse{}, nil
+	return newOrUpdateTestDomainData, nil
 }

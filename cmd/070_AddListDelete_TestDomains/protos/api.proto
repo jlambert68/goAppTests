@@ -131,11 +131,9 @@ enum NewOrUpdateTestDomainUpdateType {
 }
 
 message NewOrUpdateTestDomainResponse {
-  int32 Id = 1;
-  string Guid = 2;
-  string UpdateTimestamp = 3;
-  bool ResponseStatus = 4;
-  string ResponseMessage = 5;
+  NewOrUpdateTestDomainData NewOrUpdateTestDomainData = 1;
+  bool ResponseStatus = 2;
+  string ResponseMessage = 3;
 }
 
 
