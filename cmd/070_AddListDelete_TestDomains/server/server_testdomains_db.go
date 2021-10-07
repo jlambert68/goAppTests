@@ -76,33 +76,39 @@ func (server *Server) SaveNewOrUpdateTestDomainDB(newOrUpdateTestDomainRequest *
 		}).Debug("Exiting: SaveNewOrUpdateTestDomainDB()")
 	}()
 
-	var currentTimeStamp time.Time
-	currentTimeStamp = time.Now()
+	//var currentTimeStamp time.Time
+	currentTimeStamp := time.Now().Format("2006-01-02 15:04:05.000000")
 
 	sqlToExecute := "Select * From sp_insert_new_or_updated_testdomain("
 	sqlToExecute = sqlToExecute + "'" + newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Guid + "', "
 	sqlToExecute = sqlToExecute + "'" + newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Name + "', "
 	sqlToExecute = sqlToExecute + "'" + newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Description + "', "
-	sqlToExecute = sqlToExecute + "'" + strconv.FormatBool(newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.ReadyForUse) + "', "
-	sqlToExecute = sqlToExecute + "'" + strconv.FormatBool(newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Activated) + "', "
-	sqlToExecute = sqlToExecute + "'" + strconv.FormatBool(newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Deleted) + "', "
-	sqlToExecute = sqlToExecute + "'" + newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.UpdateTimestamp + "') "
+	sqlToExecute = sqlToExecute + strconv.FormatBool(newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.ReadyForUse) + ", "
+	sqlToExecute = sqlToExecute + strconv.FormatBool(newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Activated) + ", "
+	sqlToExecute = sqlToExecute + strconv.FormatBool(newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Deleted) + ", "
+	sqlToExecute = sqlToExecute + "'" + currentTimeStamp + "') "
 
-	rows, err := DbPool.Query(context.Background(), sqlToExecute,
-		newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Guid,
-		newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Name,
-		newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Description,
-		newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.ReadyForUse,
-		newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Activated,
-		newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Deleted,
-		currentTimeStamp,
-	)
+	rows, err := DbPool.Query(context.Background(), sqlToExecute)
+
+	/*
+		rows, err := DbPool.Query(context.Background(), sqlToExecute,
+			newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Guid,
+			newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Name,
+			newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Description,
+			newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.ReadyForUse,
+			newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Activated,
+			newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Deleted,
+			currentTimeStamp,
+		)
+	*/
 
 	if err != nil {
 		server.logger.WithFields(logrus.Fields{
 			"Id":                           "30d3e05e-8ef5-42b6-bee8-bc0857966901",
 			"newOrUpdateTestDomainRequest": newOrUpdateTestDomainRequest,
+			"err.Error()":                  err.Error(),
 		}).Error("Something went wrong when creating new or updating TestDomain")
+		return api.NewOrUpdateTestDomainData{}, err
 	}
 
 	var newOrUpdateTestDomainData api.NewOrUpdateTestDomainData

@@ -9,12 +9,17 @@ begin
     return query
         SELECT *
         FROM testdomains
-        WHERE testdomains.deleted = false
-        ORDER BY testdomains.id;
+        WHERE testdomains.deleted = false AND
+                testdomains.replaced_by_new_version = false
+        ORDER BY testdomains.name;
+
+
 end;
 $$;
 
 alter function sp_listtestdomains() owner to testuser;
+
+
 
 -- ********************************************************************
 
@@ -73,34 +78,11 @@ alter function sp_list_magictable_metadata() owner to testuser;
 -- ********************************************************************
 -- Add a New TestDomain or Update an Existing. Either way, a new row is created.
 
-create function sp_insert_new_or_updated_testdomain(
-    in_guid character varying,
-    in_name character varying,
-    in_description character varying,
-    in_ready_for_use boolean,
-    in_activated boolean,
-    in_deleted boolean,
-    in_update_timestamp timestamptz)
-
--- Returns the newly created or updated TestDomain
-    RETURNS TABLE
-            (
-                id               integer,
-                guid             character varying,
-                name             character varying,
-                description      character varying,
-                ready_for_use    boolean,
-                activated        boolean,
-                deleted          boolean,
-                update_timestamp timestamptz
-            )
-
-
+create function sp_insert_new_or_updated_testdomain(in_guid varchar, in_name varchar, in_description varchar, in_ready_for_use boolean, in_activated boolean, in_deleted boolean, in_update_timestamp timestamptz)
+    returns TABLE(id int, guid varchar, name varchar, description character varying, ready_for_use boolean, activated boolean, deleted boolean, update_timestamp timestamptz)
     language plpgsql
 as
 $$
-
-
 begin
     -- Insert New or Updated TestDomain as new row
     insert into testdomains(guid,
@@ -117,7 +99,7 @@ begin
             in_activated,
             in_deleted,
             in_update_timestamp);
-    commit;
+    --commit;
 
     -- Retrieve the newly created or updated TestDomain
     return query
@@ -139,14 +121,7 @@ begin
 end;
 $$;
 
-alter function sp_insert_new_or_updated_testdomain(
-    varchar,
-    varchar,
-    varchar,
-    boolean,
-    boolean,
-    boolean,
-    timestamptz) owner to testuser;
+alter function sp_insert_new_or_updated_testdomain(varchar, varchar, varchar, boolean, boolean, boolean, timestamp with time zone) owner to testuser;
 
 
 

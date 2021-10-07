@@ -110,7 +110,7 @@ func (mt *MagicTable) onButtonClick(buttonThatWasClicked int) {
 
 	//fmt.Println("Button that was clicked: " + strconv.Itoa(buttonThatWasClicked))
 
-	keyValuePar := make(map[string]interface{})
+	keyValuePar := make(keyValueMapType)
 
 	switch buttonThatWasClicked {
 	case NewButton:
@@ -144,43 +144,24 @@ func (mt *MagicTable) onButtonClick(buttonThatWasClicked int) {
 			mt.tableState = TableState_New_Save
 			//fmt.Println("Current State: 'TableState_New_Save'")
 
+			var newOrUpdateTestDomainUpdateType api.NewOrUpdateTestDomainUpdateType
+
+			keyValuePar = mt.GenerateKeyValueMapForMagicTableMetaData()
+			newOrUpdateTestDomainUpdateType = api.NewOrUpdateTestDomainUpdateType_NewTestDomain
+			mt.SaveNewOrUpdateTestDomain(keyValuePar, newOrUpdateTestDomainUpdateType)
+
 			mt.tableState = TableState_List
 			//fmt.Println("Current State: 'TableState_List'")
 
 		case TableState_Edit:
 			mt.tableState = TableState_Edit_Save
 			//fmt.Println("Current State: 'TableState_Edit_Save'")
+
 			var newOrUpdateTestDomainUpdateType api.NewOrUpdateTestDomainUpdateType
-			var rowTextBoxValue app.Value
 
-			fmt.Println("mt.testDataAndMetaData.magicTableMetaData - ", mt.testDataAndMetaData.magicTableMetaData)
-			for _, columnMetadataResponse := range mt.testDataAndMetaData.magicTableMetaData {
-
-				columnDataName := columnMetadataResponse.GetColumnDataName()
-				//rowTextBoxValue := mt.GetRowTextBoxValueForEdit(columnDataName)
-				elem := app.Window().
-					GetElementByID(columnDataName)
-
-				//fmt.Println(columnDataName, elem.IsNull())
-				//fmt.Println(columnDataName, elem.Get("value"))
-				if columnMetadataResponse.GetShouldBeVisible() == true {
-					rowTextBoxValue = elem.Get("value")
-				} else {
-					rowTextBoxValue = app.ValueOf(mt.GetRowTextBoxValueForEdit(columnDataName))
-				}
-
-				//fmt.Println("columnDataName - rowTextBoxValue", columnDataName, rowTextBoxValue)
-				//rowTextBoxValue ? elem.IsNull()
-
-				keyValuePar[columnDataName] = rowTextBoxValue
-			}
-
-			fmt.Println("keyValuePar: ", keyValuePar)
-
+			keyValuePar = mt.GenerateKeyValueMapForMagicTableMetaData()
 			newOrUpdateTestDomainUpdateType = api.NewOrUpdateTestDomainUpdateType_UpdateTestDomain
-
 			mt.SaveNewOrUpdateTestDomain(keyValuePar, newOrUpdateTestDomainUpdateType)
-			//fmt.Println("SIMULATE::: CALL DB",newOrUpdateTestDomainUpdateType)
 
 			mt.tableState = TableState_List
 			//fmt.Println("Current State: 'TableState_List'")
@@ -237,4 +218,35 @@ func (mt *MagicTable) onButtonClick(buttonThatWasClicked int) {
 	}
 
 	mt.Update()
+}
+
+func (mt *MagicTable) GenerateKeyValueMapForMagicTableMetaData() keyValueMapType {
+
+	var rowTextBoxValue string //app.Value
+
+	keyValuePar := make(keyValueMapType)
+
+	//fmt.Println("mt.testDataAndMetaData.magicTableMetaData - ", mt.testDataAndMetaData.magicTableMetaData)
+	for _, columnMetadataResponse := range mt.testDataAndMetaData.magicTableMetaData {
+
+		columnDataName := columnMetadataResponse.GetColumnDataName()
+		//rowTextBoxValue := mt.GetRowTextBoxValueForEdit(columnDataName)
+		elem := app.Window().
+			GetElementByID(columnDataName)
+
+		//fmt.Println(columnDataName, elem.IsNull())
+		//fmt.Println(columnDataName, elem.Get("value"))
+		if columnMetadataResponse.GetShouldBeVisible() == true {
+			rowTextBoxValue = elem.Get("value").String()
+		} else {
+			rowTextBoxValue = mt.GetRowTextBoxValueForEdit(columnDataName)
+		}
+
+		//fmt.Println("columnDataName - rowTextBoxValue", columnDataName, rowTextBoxValue)
+		//rowTextBoxValue ? elem.IsNull()
+
+		keyValuePar[columnDataName] = rowTextBoxValue
+	}
+
+	return keyValuePar
 }

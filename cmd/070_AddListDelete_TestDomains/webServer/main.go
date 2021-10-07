@@ -129,6 +129,13 @@ func main() {
 			"/web/js/alertFunctions.js",
 			//"https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js\" integrity=\"sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM\" crossorigin=\"anonymous\"", // Remote script
 		},
+		BackgroundColor: "#151515",
+
+		Description: "List, wake and scan nodes in a network.",
+		Icon: app.Icon{
+			Default: "/web/FenixIcon.jpeg",
+		},
+		ThemeColor: "#151515",
 	}
 
 	mux.HandleFunc("/app.wasm", func(w http.ResponseWriter, r *http.Request) {

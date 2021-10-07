@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"github.com/sirupsen/logrus"
 	"goAppTest1/cmd/070_AddListDelete_TestDomains/protos/api"
 )
@@ -26,7 +25,9 @@ func (server *Server) ListTestDomains(ctx context.Context, in *api.EmptyParamete
 
 	testDomainsFromDB, err := server.ListTestDomainsInDB()
 	if err != nil {
-		fmt.Println(err.Error())
+		server.logger.WithFields(logrus.Fields{
+			"Id": "7c3ec670-105a-4a6b-9d34-4a5694ff194a",
+		}).Error(err.Error())
 		return testDomainsRespons, err
 	}
 
@@ -162,7 +163,7 @@ func (server *Server) SaveNewOrUpdateTestDomain(ctx context.Context, newOrUpdate
 		"Id":                     "3c4b328f-6923-49eb-80a0-9c83cf917f28",
 		"Message to Save/Update": newOrUpdateTestDomainRequest,
 		"New Message":            newOrUpdateTestDomainData,
-	}).Error("Message was Saved/Updated in database")
+	}).Debug("Message was Saved/Updated in database")
 
 	return returnMessage, err
 }
