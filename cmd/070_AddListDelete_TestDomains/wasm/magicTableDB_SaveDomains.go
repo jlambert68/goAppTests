@@ -46,18 +46,23 @@ func (mt *MagicTable) SaveNewOrUpdateTestDomain(newOrUpdateTestDomainDataKeyValu
 						fmt.Println(reflect.ValueOf(value).Kind())
 						//intValue := value.(int) //reflect.ValueOf(value).Int()
 
-						intValue, err := strconv.Atoi(value)
-						if err != nil {
-							mt.logger.WithFields(logrus.Fields{
-								"Id":              "2e811f13-bd0f-4dc1-9d17-40b396a5e76a",
-								"err.Error()":     err.Error(),
-								"Name to parse":   structField,
-								"Value to  parse": value,
-							}).Panic("Error when converting into Integer")
-						}
+						// Only try to reflect if there are a value
+						if len(value) != 0 {
+							intValue, err := strconv.Atoi(value)
+							if err != nil {
+								mt.logger.WithFields(logrus.Fields{
+									"Id":              "2e811f13-bd0f-4dc1-9d17-40b396a5e76a",
+									"err.Error()":     err.Error(),
+									"key to parse":    key,
+									"Value to  parse": value,
+								}).Panic("Error when converting into Integer")
+							}
 
-						if !structField.OverflowInt(int64(intValue)) {
-							structField.SetInt(int64(intValue))
+							if !structField.OverflowInt(int64(intValue)) {
+								structField.SetInt(int64(intValue))
+							}
+						} else {
+							structField.SetInt(int64(0))
 						}
 
 					case reflect.String:
@@ -69,17 +74,24 @@ func (mt *MagicTable) SaveNewOrUpdateTestDomain(newOrUpdateTestDomainDataKeyValu
 						//boolValue := value.(bool)  //reflect.ValueOf(value).String()
 						//fmt.Println(" reflect.Bool", value, reflect.ValueOf(value).Kind(), boolValue)
 
-						boolValue, err := strconv.ParseBool(value)
-						if err != nil {
-							mt.logger.WithFields(logrus.Fields{
-								"Id":              "400b4d21-2b85-47e5-af6f-68201c252814",
-								"err.Error()":     err.Error(),
-								"Name to parse":   structField,
-								"Value to  parse": value,
-							}).Panic("Error when converting into Boolean")
-						}
+						// Only try to reflect if there are a value
+						if len(value) != 0 {
+							boolValue, err := strconv.ParseBool(value)
+							if err != nil {
+								mt.logger.WithFields(logrus.Fields{
+									"Id":              "400b4d21-2b85-47e5-af6f-68201c252814",
+									"err.Error()":     err.Error(),
+									"key to parse":    key,
+									"Value to  parse": value,
+									"lenght of bool":  len(value),
+								}).Panic("Error when converting into Boolean")
+							}
 
-						structField.SetBool(boolValue)
+							structField.SetBool(boolValue)
+
+						} else {
+							structField.SetBool(false)
+						}
 
 					//TODO case reflect.Float64:
 
