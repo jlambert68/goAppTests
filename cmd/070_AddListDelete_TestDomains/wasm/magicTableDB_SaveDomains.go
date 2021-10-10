@@ -18,13 +18,13 @@ func (mt *MagicTable) SaveNewOrUpdateTestDomain(newOrUpdateTestDomainDataKeyValu
 	mt.logger.WithFields(logrus.Fields{
 		"Id":          "87ea65e4-526b-4ed6-8c19-e6f46fea2ffb",
 		"NewOrUpdate": newOrUpdateTestDomainUpdateType,
-	}).Debug("Entering: SaveNewOrUpdateTestDomain()")
+	}).Debug("Entering: DeleteTestDomain()")
 
 	defer func() {
 		mt.logger.WithFields(logrus.Fields{
 			"Id":                                    "0fe3ef6b-82aa-43ec-8ff9-ee4c110da78d",
 			"newOrUpdateTestDomainUpdateTypeString": newOrUpdateTestDomainUpdateTypeString,
-		}).Debug("Exiting: SaveNewOrUpdateTestDomain()")
+		}).Debug("Exiting: DeleteTestDomain()")
 	}()
 
 	for key, value := range newOrUpdateTestDomainDataKeyValueMap {
@@ -135,6 +135,75 @@ func (mt *MagicTable) SaveNewOrUpdateTestDomain(newOrUpdateTestDomainDataKeyValu
 	if err != nil {
 		mt.logger.WithFields(logrus.Fields{
 			"Id":  "c348f559-b704-4269-a7ac-24a825586bdf",
+			"err": err,
+		}).Panic("Something got wrong when calling database")
+	}
+
+	// Update list
+	mt.SearchInDB(mt.searchString)
+
+}
+
+func (mt *MagicTable) DeleteTestDomain(deleteTestDomainDataKeyValueMap keyValueMapType) {
+
+	var deleteTestDomainRequest api.DeleteTestDomainRequest
+
+	mt.logger.WithFields(logrus.Fields{
+		"Id": "72f1e015-0d1d-4eb1-bad9-e4d0bb6c050d",
+	}).Debug("Entering: DeleteTestDomain()")
+
+	defer func() {
+		mt.logger.WithFields(logrus.Fields{
+			"Id": "b3d05bc7-bbff-4e38-b727-9c097d1fa7a4",
+		}).Debug("Exiting: DeleteTestDomain()")
+	}()
+
+	for key, value := range deleteTestDomainDataKeyValueMap {
+
+		// Only keep value for "guid"
+		if key != "Guid" {
+			continue
+		}
+
+		pointToStructDeleteTestDomainData := reflect.ValueOf(&deleteTestDomainRequest)
+		// struct
+		myStruct := pointToStructDeleteTestDomainData.Elem()
+		if myStruct.Kind() == reflect.Struct {
+			// exported field
+			structField := myStruct.FieldByName(key)
+			if structField.IsValid() {
+				// A Value can be changed only if it is
+				// addressable and was not obtained by
+				// the use of unexported struct fields.
+				if structField.CanSet() {
+					// change value of N
+					switch structField.Kind() {
+
+					case reflect.String:
+						stringValue := reflect.ValueOf(value)
+						structField.SetString(stringValue.String())
+
+					default:
+						mt.logger.WithFields(logrus.Fields{
+							"Id":                 "357306d9-e0ae-4357-b6b8-0bc73d1d8eb7",
+							"structField.Kind()": structField.Kind(),
+						}).Panic("Unknown 'structField.Kind()'")
+					}
+
+				}
+			}
+		}
+	}
+
+	// Unselect rows
+	//mt.rowSelected = -1
+
+	//Call database for deleteing
+	_, err := api.CallApiDeleteTestDomain(deleteTestDomainRequest)
+
+	if err != nil {
+		mt.logger.WithFields(logrus.Fields{
+			"Id":  "a7b1911b-754e-4186-85ac-48469037cc5b",
 			"err": err,
 		}).Panic("Something got wrong when calling database")
 	}

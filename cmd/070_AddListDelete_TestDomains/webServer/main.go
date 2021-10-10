@@ -131,9 +131,9 @@ func main() {
 		},
 		BackgroundColor: "#151515",
 
-		Description: "List, wake and scan nodes in a network.",
+		Description: "Administrate all lists that can be used within the areas.",
 		Icon: app.Icon{
-			Default: "/web/FenixIcon.jpeg",
+			Default: "/web/FenixIcon_512.png",
 		},
 		ThemeColor: "#151515",
 	}

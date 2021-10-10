@@ -86,6 +86,10 @@ func (mt *MagicTable) onModalOKClicked() app.EventHandler {
 
 		case TableState_Delete_Save:
 			fmt.Println("Send 'Delete' to DB")
+
+			keyValuePar := mt.GenerateKeyValueMapForMagicTableMetaData()
+			mt.DeleteTestDomain(keyValuePar)
+
 			mt.rowSelected = -1
 			mt.uniqueRowSelected = -1
 

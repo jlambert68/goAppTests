@@ -83,9 +83,11 @@ service Api {
 
   rpc ListTestDomains(EmptyParameter) returns (ListTestDomainsRespons);
   rpc SaveNewOrUpdateTestDomain(NewOrUpdateTestDomainRequest) returns (NewOrUpdateTestDomainResponse);
+  rpc DeleteTestDomain(DeleteTestDomainRequest) returns (DeleteTestDomainResponse);
 
   rpc ListTestInstructions(EmptyParameter) returns (ListTestInstructionsRespons);
   rpc SaveNewOrUpdateTestInstruction(NewOrUpdateTestInstructionRequest) returns (NewOrUpdateTestInstructionResponse);
+
 
   rpc ListTablesToEdit(EmptyParameter) returns (ListTablesToEditRespons);
 }
@@ -136,6 +138,26 @@ message NewOrUpdateTestDomainResponse {
   string ResponseMessage = 3;
 }
 
+message DeleteTestDomainRequest {
+  string Guid = 1;
+}
+
+message DeleteTestDomainResponse {
+  DeleteTestDomainData DeleteTestDomainData = 1;
+  bool ResponseStatus = 2;
+  string ResponseMessage = 3;
+}
+
+message DeleteTestDomainData {
+  int32 Id = 1;
+  string Guid = 2;
+  string Name = 3;
+  string Description = 4;
+  bool ReadyForUse = 5;
+  bool Activated = 6;
+  bool Deleted = 7;
+  string UpdateTimestamp = 8;
+}
 
 // TestInstructions section
 

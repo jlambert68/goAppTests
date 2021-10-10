@@ -100,13 +100,13 @@ func (server *Server) SaveNewOrUpdateTestDomain(ctx context.Context, newOrUpdate
 	server.logger.WithFields(logrus.Fields{
 		"Id":    "fd690fdb-69b4-4fae-887f-03fb10d40db7",
 		"Trace": server.trace(false),
-	}).Debug("Entering: SaveNewOrUpdateTestDomain()")
+	}).Debug("Entering: DeleteTestDomain()")
 
 	defer func() {
 		server.logger.WithFields(logrus.Fields{
 			"Id":    "c987dbef-c5fb-4e55-9de0-0f97ab51366d",
 			"Trace": server.trace(false),
-		}).Debug("Exiting: SaveNewOrUpdateTestDomain()")
+		}).Debug("Exiting: DeleteTestDomain()")
 	}()
 
 	var err error
@@ -164,6 +164,55 @@ func (server *Server) SaveNewOrUpdateTestDomain(ctx context.Context, newOrUpdate
 		"Message to Save/Update": newOrUpdateTestDomainRequest,
 		"New Message":            newOrUpdateTestDomainData,
 	}).Debug("Message was Saved/Updated in database")
+
+	return returnMessage, err
+}
+
+func (server *Server) DeleteTestDomain(ctx context.Context, deleteTestDomainRequest *api.DeleteTestDomainRequest) (*api.DeleteTestDomainResponse, error) {
+
+	server.logger.WithFields(logrus.Fields{
+		"Id":    "d479d8e2-49eb-42fb-a3d1-23ec11a13de1",
+		"Trace": server.trace(false),
+	}).Debug("Entering: DeleteTestDomain()")
+
+	defer func() {
+		server.logger.WithFields(logrus.Fields{
+			"Id":    "8375accf-a138-4571-8495-f3088d2322e1",
+			"Trace": server.trace(false),
+		}).Debug("Exiting: DeleteTestDomain()")
+	}()
+
+	var err error
+	var returnMessage *api.DeleteTestDomainResponse
+	err = nil
+
+	deletedTestDomainData, err := server.DeleteTestDomainDB(deleteTestDomainRequest.Guid)
+	if err != nil {
+		returnMessage = &api.DeleteTestDomainResponse{
+			DeleteTestDomainData: nil,
+			ResponseStatus:       false,
+			ResponseMessage:      err.Error(),
+		}
+
+		server.logger.WithFields(logrus.Fields{
+			"Id":          "3223917c-9886-4fd4-a472-9b283932df3d",
+			"err.Error()": err.Error(),
+		}).Error("Error when calling database")
+
+		return returnMessage, nil
+	}
+
+	returnMessage = &api.DeleteTestDomainResponse{
+		DeleteTestDomainData: &deletedTestDomainData,
+		ResponseStatus:       true,
+		ResponseMessage:      "Message was deleted in database",
+	}
+
+	server.logger.WithFields(logrus.Fields{
+		"Id":                "cf58a37f-59bc-4271-af9d-853efe29a202",
+		"Message to Delete": deleteTestDomainRequest,
+		"deleted Message":   deletedTestDomainData,
+	}).Debug("Message was Deleted in database")
 
 	return returnMessage, err
 }

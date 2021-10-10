@@ -37,7 +37,7 @@ func (server *Server) ListTestDomainsInDB() ([]api.TestDomainForListingMessage, 
 
 	var testDomainForListingMessage api.TestDomainForListingMessage
 	var returnMessage []api.TestDomainForListingMessage
-	var myTimeStamp interface{} //time.Time
+	var myTimeStamp time.Time
 
 	for rows.Next() {
 
@@ -49,7 +49,7 @@ func (server *Server) ListTestDomainsInDB() ([]api.TestDomainForListingMessage, 
 			&testDomainForListingMessage.ReadyForUse,
 			&testDomainForListingMessage.Activated,
 			&testDomainForListingMessage.Deleted,
-			myTimeStamp)
+			&myTimeStamp)
 		if err != nil {
 			return returnMessage, err
 		}
@@ -91,15 +91,16 @@ func (server *Server) SaveNewOrUpdateTestDomainDB(newOrUpdateTestDomainRequest *
 	rows, err := DbPool.Query(context.Background(), sqlToExecute)
 
 	/*
-		rows, err := DbPool.Query(context.Background(), sqlToExecute,
-			newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Guid,
-			newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Name,
-			newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Description,
-			newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.ReadyForUse,
-			newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Activated,
-			newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Deleted,
-			currentTimeStamp,
-		)
+			rows, err := DbPool.Query(context.Background(), sqlToExecute,
+				newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Guid,
+				newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Name,
+				newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Description,
+				newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.ReadyForUse,
+				newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Activated,
+				newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Deleted,
+				currentTimeStamp,
+			)rowsAffected, err := result.RowsAffected()
+		fmt.Println("Number of rows affected:", rowsAffected)
 	*/
 
 	if err != nil {
@@ -113,13 +114,13 @@ func (server *Server) SaveNewOrUpdateTestDomainDB(newOrUpdateTestDomainRequest *
 
 	var newOrUpdateTestDomainData api.NewOrUpdateTestDomainData
 
-	var myTimeStamp interface{} //time.Time
+	var myTimeStamp time.Time
 
 	newOrUpdateTestDomainData = api.NewOrUpdateTestDomainData{}
 
 	for rows.Next() {
 
-		err = rows.Scan(&newOrUpdateTestDomainData.Id, &newOrUpdateTestDomainData.Guid, &newOrUpdateTestDomainData.Name, &newOrUpdateTestDomainData.Description, &newOrUpdateTestDomainData.ReadyForUse, &newOrUpdateTestDomainData.Activated, &newOrUpdateTestDomainData.Deleted, myTimeStamp)
+		err = rows.Scan(&newOrUpdateTestDomainData.Id, &newOrUpdateTestDomainData.Guid, &newOrUpdateTestDomainData.Name, &newOrUpdateTestDomainData.Description, &newOrUpdateTestDomainData.ReadyForUse, &newOrUpdateTestDomainData.Activated, &newOrUpdateTestDomainData.Deleted, &myTimeStamp)
 		if err != nil {
 			return newOrUpdateTestDomainData, err
 		}
@@ -129,4 +130,49 @@ func (server *Server) SaveNewOrUpdateTestDomainDB(newOrUpdateTestDomainRequest *
 	}
 
 	return newOrUpdateTestDomainData, nil
+}
+
+// Delete TestDomain by setting a deleted flag
+func (server *Server) DeleteTestDomainDB(guid string) (api.DeleteTestDomainData, error) {
+
+	server.logger.WithFields(logrus.Fields{
+		"Id":    "efef7c69-89a7-48a2-b7df-73e4b18d240e",
+		"Trace": server.trace(false),
+	}).Debug("Entering: DeleteTestDomainDB()")
+
+	defer func() {
+		server.logger.WithFields(logrus.Fields{
+			"Id":    "cf8f157e-5646-4739-a1e2-0375eeda4778",
+			"Trace": server.trace(false),
+		}).Debug("Exiting: DeleteTestDomainDB()")
+	}()
+
+	sqlToExecute := "Select * From sp_delete_testdomain("
+	sqlToExecute = sqlToExecute + "'" + guid + "') "
+	rows, err := DbPool.Query(context.Background(), sqlToExecute)
+
+	if err != nil {
+		server.logger.WithFields(logrus.Fields{
+			"Id":          "3a8d7a2d-6fb2-434d-91e5-9b38b92eca2e",
+			"err.Error()": err.Error(),
+		}).Error("Something went wrong when deleteing a TestDomain")
+		return api.DeleteTestDomainData{}, err
+	}
+
+	var myTimeStamp time.Time
+
+	deletedTestDomainData := api.DeleteTestDomainData{}
+
+	for rows.Next() {
+
+		err = rows.Scan(&deletedTestDomainData.Id, &deletedTestDomainData.Guid, &deletedTestDomainData.Name, &deletedTestDomainData.Description, &deletedTestDomainData.ReadyForUse, &deletedTestDomainData.Activated, &deletedTestDomainData.Deleted, &myTimeStamp)
+		if err != nil {
+			return deletedTestDomainData, err
+		}
+		deletedTestDomainData.UpdateTimestamp = fmt.Sprintf("%v", myTimeStamp)
+
+		break
+	}
+
+	return deletedTestDomainData, nil
 }
