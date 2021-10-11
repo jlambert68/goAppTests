@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"goAppTest1/cmd/070_AddListDelete_TestDomains/protos/api"
@@ -49,7 +50,9 @@ func (server *Server) ListTestDomainsInDB() ([]api.TestDomainForListingMessage, 
 			&testDomainForListingMessage.ReadyForUse,
 			&testDomainForListingMessage.Activated,
 			&testDomainForListingMessage.Deleted,
-			&myTimeStamp)
+			&myTimeStamp,
+			&testDomainForListingMessage.DomainId,
+			&testDomainForListingMessage.DomainVersion)
 		if err != nil {
 			return returnMessage, err
 		}
@@ -77,16 +80,14 @@ func (server *Server) SaveNewOrUpdateTestDomainDB(newOrUpdateTestDomainRequest *
 	}()
 
 	//var currentTimeStamp time.Time
-	currentTimeStamp := time.Now().Format("2006-01-02 15:04:05.000000")
+	//currentTimeStamp := time.Now().Format("2006-01-02 15:04:05.000000")
 
 	sqlToExecute := "Select * From sp_insert_new_or_updated_testdomain("
 	sqlToExecute = sqlToExecute + "'" + newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Guid + "', "
 	sqlToExecute = sqlToExecute + "'" + newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Name + "', "
 	sqlToExecute = sqlToExecute + "'" + newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Description + "', "
 	sqlToExecute = sqlToExecute + strconv.FormatBool(newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.ReadyForUse) + ", "
-	sqlToExecute = sqlToExecute + strconv.FormatBool(newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Activated) + ", "
-	sqlToExecute = sqlToExecute + strconv.FormatBool(newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Deleted) + ", "
-	sqlToExecute = sqlToExecute + "'" + currentTimeStamp + "') "
+	sqlToExecute = sqlToExecute + strconv.FormatBool(newOrUpdateTestDomainRequest.NewOrUpdateTestDomainData.Activated) + ") "
 
 	rows, err := DbPool.Query(context.Background(), sqlToExecute)
 
@@ -118,18 +119,25 @@ func (server *Server) SaveNewOrUpdateTestDomainDB(newOrUpdateTestDomainRequest *
 
 	newOrUpdateTestDomainData = api.NewOrUpdateTestDomainData{}
 
+	rowsReceived := false
+
 	for rows.Next() {
 
-		err = rows.Scan(&newOrUpdateTestDomainData.Id, &newOrUpdateTestDomainData.Guid, &newOrUpdateTestDomainData.Name, &newOrUpdateTestDomainData.Description, &newOrUpdateTestDomainData.ReadyForUse, &newOrUpdateTestDomainData.Activated, &newOrUpdateTestDomainData.Deleted, &myTimeStamp)
+		err = rows.Scan(&newOrUpdateTestDomainData.Id, &newOrUpdateTestDomainData.Guid, &newOrUpdateTestDomainData.Name, &newOrUpdateTestDomainData.Description, &newOrUpdateTestDomainData.ReadyForUse, &newOrUpdateTestDomainData.Activated) //, &newOrUpdateTestDomainData.Deleted, &myTimeStamp)
 		if err != nil {
 			return newOrUpdateTestDomainData, err
 		}
 		newOrUpdateTestDomainData.UpdateTimestamp = fmt.Sprintf("%v", myTimeStamp) // myTimeStamp.String()
-
+		rowsReceived = true
 		break
 	}
 
-	return newOrUpdateTestDomainData, nil
+	if rowsReceived == true {
+		return newOrUpdateTestDomainData, nil
+
+	} else {
+		return api.NewOrUpdateTestDomainData{}, errors.New("no rows received from Database, expected 1 row")
+	}
 }
 
 // Delete TestDomain by setting a deleted flag
@@ -155,24 +163,32 @@ func (server *Server) DeleteTestDomainDB(guid string) (api.DeleteTestDomainData,
 		server.logger.WithFields(logrus.Fields{
 			"Id":          "3a8d7a2d-6fb2-434d-91e5-9b38b92eca2e",
 			"err.Error()": err.Error(),
-		}).Error("Something went wrong when deleteing a TestDomain")
+		}).Error("Something went wrong when deleting a TestDomain")
 		return api.DeleteTestDomainData{}, err
 	}
 
 	var myTimeStamp time.Time
 
 	deletedTestDomainData := api.DeleteTestDomainData{}
+	rowsReceived := false
 
 	for rows.Next() {
 
-		err = rows.Scan(&deletedTestDomainData.Id, &deletedTestDomainData.Guid, &deletedTestDomainData.Name, &deletedTestDomainData.Description, &deletedTestDomainData.ReadyForUse, &deletedTestDomainData.Activated, &deletedTestDomainData.Deleted, &myTimeStamp)
+		err = rows.Scan(&deletedTestDomainData.Id, &deletedTestDomainData.Guid, &deletedTestDomainData.Name, &deletedTestDomainData.Description, &deletedTestDomainData.ReadyForUse, &deletedTestDomainData.Activated, &deletedTestDomainData.Deleted, &myTimeStamp, &deletedTestDomainData.DomainId, &deletedTestDomainData.DomainVersion)
 		if err != nil {
 			return deletedTestDomainData, err
 		}
 		deletedTestDomainData.UpdateTimestamp = fmt.Sprintf("%v", myTimeStamp)
 
+		rowsReceived = true
 		break
 	}
 
-	return deletedTestDomainData, nil
+	if rowsReceived == true {
+		return deletedTestDomainData, nil
+
+	} else {
+		return api.DeleteTestDomainData{}, errors.New("no rows received from Database, expected 1 row")
+	}
+
 }

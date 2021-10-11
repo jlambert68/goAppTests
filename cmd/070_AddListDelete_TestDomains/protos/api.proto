@@ -104,6 +104,8 @@ message testDomainForListingMessage {
   bool Deleted = 7;
   string UpdateTimestamp = 8;
   int64 UniqueId = 9;
+  int32 Domain_id = 10;
+  int32 Domain_version = 11;
 }
 
 message ListTestDomainsRespons {
@@ -157,6 +159,8 @@ message DeleteTestDomainData {
   bool Activated = 6;
   bool Deleted = 7;
   string UpdateTimestamp = 8;
+  int32 Domain_id = 9;
+  int32 Domain_version = 10;
 }
 
 // TestInstructions section
@@ -191,6 +195,8 @@ message NewOrUpdateTestInstructionData {
   bool Activated = 6;
   bool Deleted = 7;
   string UpdateTimestamp = 8;
+  int32 Domain_id = 9;
+  int32 Domain_version = 10;
 }
 
 enum NewOrUpdateTestInstructionUpdateType {

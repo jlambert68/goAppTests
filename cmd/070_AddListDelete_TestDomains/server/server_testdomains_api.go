@@ -45,6 +45,8 @@ func (server *Server) ListTestDomains(ctx context.Context, in *api.EmptyParamete
 			Deleted:         testDomainFromDB.Deleted,
 			UpdateTimestamp: testDomainFromDB.UpdateTimestamp,
 			UniqueId:        int64(rowNumber),
+			DomainId:        testDomainFromDB.DomainId,
+			DomainVersion:   testDomainFromDB.DomainVersion,
 		}
 
 		testDomainForListingMessages = append(testDomainForListingMessages, testDomain)
@@ -100,13 +102,13 @@ func (server *Server) SaveNewOrUpdateTestDomain(ctx context.Context, newOrUpdate
 	server.logger.WithFields(logrus.Fields{
 		"Id":    "fd690fdb-69b4-4fae-887f-03fb10d40db7",
 		"Trace": server.trace(false),
-	}).Debug("Entering: DeleteTestDomain()")
+	}).Debug("Entering: SaveNewOrUpdateTestDomain()")
 
 	defer func() {
 		server.logger.WithFields(logrus.Fields{
 			"Id":    "c987dbef-c5fb-4e55-9de0-0f97ab51366d",
 			"Trace": server.trace(false),
-		}).Debug("Exiting: DeleteTestDomain()")
+		}).Debug("Exiting: SaveNewOrUpdateTestDomain()")
 	}()
 
 	var err error
