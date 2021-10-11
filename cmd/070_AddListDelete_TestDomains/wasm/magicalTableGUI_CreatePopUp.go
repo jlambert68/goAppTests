@@ -5,6 +5,15 @@ import (
 	"github.com/maxence-charriere/go-app/v8/pkg/app"
 )
 
+type modalCommunicationStruct struct {
+	modal_ok_clicked bool
+	titel            string
+	message          string
+	keyValueMap      keyValueMapType
+}
+
+var modalMessage modalCommunicationStruct
+
 // Generates the GUI objects for the columns in the table
 func (mt *MagicTable) CreatePopUp() (app.HTMLButton, app.HTMLDiv, error) {
 	var err error
@@ -41,7 +50,7 @@ func (mt *MagicTable) CreatePopUp() (app.HTMLButton, app.HTMLDiv, error) {
 									app.H5().
 										Class("modal-title").
 										ID("staticBackdropLabel").
-										Text("Modal title"),
+										Text(modalMessage.titel),
 									app.Button().
 										Type("button").
 										Class("btn-close").
@@ -49,7 +58,7 @@ func (mt *MagicTable) CreatePopUp() (app.HTMLButton, app.HTMLDiv, error) {
 										DataSet("aria-label", "Close")),
 							app.Div().
 								Class("modal-body").
-								Text("Detta är texten som kommer att visas!!!"),
+								Text(modalMessage.message),
 							app.Div().
 								Class("modal-footer").
 								Body(
@@ -87,8 +96,22 @@ func (mt *MagicTable) onModalOKClicked() app.EventHandler {
 		case TableState_Delete_Save:
 			fmt.Println("Send 'Delete' to DB")
 
-			keyValuePar := mt.GenerateKeyValueMapForMagicTableMetaData()
-			mt.DeleteTestDomain(keyValuePar)
+			/*
+					fmt.Println("modalMessage after OpenModal", modalMessage)
+
+				if modalMessage.modal_ok_clicked == true {
+					fmt.Println("user Clicked OK OK OK OK")
+					modalMessage.modal_ok_clicked = false
+					mt.DeleteTestDomain(keyValuePar)
+				}
+			*/
+
+			//fmt.Println("modalMessage case TableState_Delete_Save", modalMessage)
+
+			//keyValuePar = mt.GenerateKeyValueMapForMagicTableMetaData()
+			fmt.Println("keyValuePar: ", modalMessage.keyValueMap)
+			mt.DeleteTestDomain(modalMessage.keyValueMap)
+			modalMessage.modal_ok_clicked = true
 
 			mt.rowSelected = -1
 			mt.uniqueRowSelected = -1
@@ -100,6 +123,7 @@ func (mt *MagicTable) onModalOKClicked() app.EventHandler {
 		app.Window().
 			GetElementByID("ModalCancel").
 			Call("click")
+
 		mt.tableState = TableState_List
 		mt.Update()
 

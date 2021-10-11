@@ -169,9 +169,23 @@ func (mt *MagicTable) onButtonClick(buttonThatWasClicked int) {
 		case TableState_Delete:
 			mt.tableState = TableState_Delete_Save
 			//fmt.Println("Current State: 'TableState_Delete_Save'")
+
+			keyValuePar = mt.GenerateKeyValueMapForMagicTableMetaData()
+			fmt.Println("keyValuePar at ButtonLogic: ", keyValuePar)
+
+			modalMessage = modalCommunicationStruct{
+				modal_ok_clicked: false,
+				titel:            "Delete TestDomain?",
+				message:          fmt.Sprint(keyValuePar),
+				keyValueMap:      keyValuePar,
+			}
+
+			fmt.Println("modalMessage before OpenModal", modalMessage)
+
 			app.Window().
 				GetElementByID("openModalButton").
 				Call("click")
+
 			//app.Window().("modal")
 			//GetElementByID("staticBackdrop").
 			//Set("bs-toggle", "modal")
@@ -218,6 +232,7 @@ func (mt *MagicTable) onButtonClick(buttonThatWasClicked int) {
 	}
 
 	mt.Update()
+
 }
 
 func (mt *MagicTable) GenerateKeyValueMapForMagicTableMetaData() keyValueMapType {
@@ -242,7 +257,7 @@ func (mt *MagicTable) GenerateKeyValueMapForMagicTableMetaData() keyValueMapType
 			rowTextBoxValue = mt.GetRowTextBoxValueForEdit(columnDataName)
 		}
 
-		//fmt.Println("columnDataName - rowTextBoxValue", columnDataName, rowTextBoxValue)
+		fmt.Println("columnDataName - rowTextBoxValue", columnDataName, rowTextBoxValue)
 		//rowTextBoxValue ? elem.IsNull()
 
 		keyValuePar[columnDataName] = rowTextBoxValue

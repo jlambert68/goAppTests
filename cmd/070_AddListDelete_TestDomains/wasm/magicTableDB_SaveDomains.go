@@ -146,6 +146,8 @@ func (mt *MagicTable) SaveNewOrUpdateTestDomain(newOrUpdateTestDomainDataKeyValu
 
 func (mt *MagicTable) DeleteTestDomain(deleteTestDomainDataKeyValueMap keyValueMapType) {
 
+	fmt.Println("deleteTestDomainDataKeyValueMap", deleteTestDomainDataKeyValueMap)
+
 	var deleteTestDomainRequest api.DeleteTestDomainRequest
 
 	mt.logger.WithFields(logrus.Fields{
@@ -159,6 +161,7 @@ func (mt *MagicTable) DeleteTestDomain(deleteTestDomainDataKeyValueMap keyValueM
 	}()
 
 	for key, value := range deleteTestDomainDataKeyValueMap {
+		fmt.Println("key -- value", key, value)
 
 		// Only keep value for "guid"
 		if key != "Guid" {
@@ -199,6 +202,7 @@ func (mt *MagicTable) DeleteTestDomain(deleteTestDomainDataKeyValueMap keyValueM
 	//mt.rowSelected = -1
 
 	//Call database for deleteing
+	fmt.Println("api.CallApiDeleteTestDomain(deleteTestDomainRequest)", deleteTestDomainRequest)
 	_, err := api.CallApiDeleteTestDomain(deleteTestDomainRequest)
 
 	if err != nil {
