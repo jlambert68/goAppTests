@@ -11,7 +11,11 @@ var DbPool *pgxpool.Pool
 
 func ConnectToDB() {
 
-	dbConnectionURL := "postgres://testuser:password@127.0.0.1:5432/testdb"
+	// Postgres version 10
+	//dbConnectionURL := "postgres://testuser:password@127.0.0.1:5433/testdb"
+
+	// Postgres version 14
+	dbConnectionURL := "postgres://caxdbuser:password@127.0.0.1:5432/caxdb"
 
 	var err error
 
@@ -22,12 +26,12 @@ func ConnectToDB() {
 	}
 	//defer dbpool.Close()
 
-	var greeting string
-	err = DbPool.QueryRow(context.Background(), "select 'Hello, world!'").Scan(&greeting)
+	var version string
+	err = DbPool.QueryRow(context.Background(), "SELECT VERSION()").Scan(&version)
+
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "QueryRow failed: %v\n", err)
 		os.Exit(1)
 	}
-
-	fmt.Println(greeting)
+	fmt.Println(version)
 }

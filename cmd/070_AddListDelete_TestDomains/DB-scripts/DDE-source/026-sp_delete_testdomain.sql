@@ -41,5 +41,5 @@ begin
 end
 $$;
 
-alter function public.sp_delete_testdomain(varchar) owner to testuser;
+alter function public.sp_delete_testdomain(varchar) owner to caxdbuser;
 

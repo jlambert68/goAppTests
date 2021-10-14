@@ -16,7 +16,7 @@ create table testdomains
 );
 
 alter table testdomains
-    owner to testuser;
+    owner to caxdbuser;
 
 create unique index testdomains_id_uindex
     on testdomains (id);

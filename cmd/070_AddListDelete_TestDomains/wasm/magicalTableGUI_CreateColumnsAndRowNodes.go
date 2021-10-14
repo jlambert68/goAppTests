@@ -22,7 +22,7 @@ func (mt *MagicTable) UpdateColumnsNodes() error {
 	mt.tableColumnNodes = []app.UI{}
 	for _, columnMetadataResponse := range mt.testDataAndMetaData.magicTableMetaData {
 		// Check if column should be shown
-		fmt.Println("columnMetadataResponse ", columnMetadataResponse)
+		//fmt.Println("columnMetadataResponse ", columnMetadataResponse)
 		columnHeader := app.Th().
 			Scope("col").
 			Body(app.Text(columnMetadataResponse.GetColumnHeaderName() + mt.SetSortIconForTableHeader(int(columnMetadataResponse.PresentationOrder)))).
@@ -79,7 +79,7 @@ func (mt *MagicTable) UpdateRowNodes() error {
 
 			//fmt.Println("columnName - columnData:: ", columnName, columnData)
 
-			fmt.Println("mt.getUniqueId(rowCounter)", mt.getUniqueId(rowCounter))
+			//fmt.Println("mt.getUniqueId(rowCounter)", mt.getUniqueId(rowCounter))
 
 			// Only retrieve UniqueId once per row
 			if uniqueId == -1 {
@@ -249,7 +249,7 @@ func (mt *MagicTable) getUniqueId(rowNumber int) int64 {
 	returnValue, err := strconv.ParseInt(returnValueString, 10, 64)
 	if err != nil {
 		fmt.Printf("%d of type %T\n", returnValue, returnValue)
-		fmt.Println("")
+		//fmt.Println("")
 	}
 
 	//fmt.Println("getUniqueId", rowNumber, dataSlice, keyValue, returnValueString, returnValue, err )

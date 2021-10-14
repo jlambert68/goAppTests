@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	//"fmt"
 	"github.com/sirupsen/logrus"
 	"goAppTest1/cmd/070_AddListDelete_TestDomains/protos/api"
 	"reflect"
@@ -28,7 +28,7 @@ func (mt *MagicTable) SaveNewOrUpdateTestDomain(newOrUpdateTestDomainDataKeyValu
 	}()
 
 	for key, value := range newOrUpdateTestDomainDataKeyValueMap {
-		fmt.Println("key, value:", key, value)
+		//fmt.Println("key, value:", key, value)
 		pointToStructNewOrUpdateTestDomainData := reflect.ValueOf(&newOrUpdateTestDomainData)
 		// struct
 		myStruct := pointToStructNewOrUpdateTestDomainData.Elem()
@@ -43,7 +43,7 @@ func (mt *MagicTable) SaveNewOrUpdateTestDomain(newOrUpdateTestDomainDataKeyValu
 					// change value of N
 					switch structField.Kind() {
 					case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-						fmt.Println(reflect.ValueOf(value).Kind())
+						//fmt.Println(reflect.ValueOf(value).Kind())
 						//intValue := value.(int) //reflect.ValueOf(value).Int()
 
 						// Only try to reflect if there are a value
@@ -146,7 +146,7 @@ func (mt *MagicTable) SaveNewOrUpdateTestDomain(newOrUpdateTestDomainDataKeyValu
 
 func (mt *MagicTable) DeleteTestDomain(deleteTestDomainDataKeyValueMap keyValueMapType) {
 
-	fmt.Println("deleteTestDomainDataKeyValueMap", deleteTestDomainDataKeyValueMap)
+	//fmt.Println("deleteTestDomainDataKeyValueMap", deleteTestDomainDataKeyValueMap)
 
 	var deleteTestDomainRequest api.DeleteTestDomainRequest
 
@@ -161,7 +161,7 @@ func (mt *MagicTable) DeleteTestDomain(deleteTestDomainDataKeyValueMap keyValueM
 	}()
 
 	for key, value := range deleteTestDomainDataKeyValueMap {
-		fmt.Println("key -- value", key, value)
+		//fmt.Println("key -- value", key, value)
 
 		// Only keep value for "guid"
 		if key != "Guid" {
@@ -202,7 +202,7 @@ func (mt *MagicTable) DeleteTestDomain(deleteTestDomainDataKeyValueMap keyValueM
 	//mt.rowSelected = -1
 
 	//Call database for deleteing
-	fmt.Println("api.CallApiDeleteTestDomain(deleteTestDomainRequest)", deleteTestDomainRequest)
+	//fmt.Println("api.CallApiDeleteTestDomain(deleteTestDomainRequest)", deleteTestDomainRequest)
 	_, err := api.CallApiDeleteTestDomain(deleteTestDomainRequest)
 
 	if err != nil {

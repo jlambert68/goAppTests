@@ -13,5 +13,5 @@ begin
 end;
 $$;
 
-alter function public.sp_list_magictable_metadata(varchar) owner to testuser;
+alter function public.sp_list_magictable_metadata(varchar) owner to caxdbuser;
 

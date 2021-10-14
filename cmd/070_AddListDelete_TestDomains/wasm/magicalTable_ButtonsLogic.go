@@ -171,7 +171,7 @@ func (mt *MagicTable) onButtonClick(buttonThatWasClicked int) {
 			//fmt.Println("Current State: 'TableState_Delete_Save'")
 
 			keyValuePar = mt.GenerateKeyValueMapForMagicTableMetaData()
-			fmt.Println("keyValuePar at ButtonLogic: ", keyValuePar)
+			//fmt.Println("keyValuePar at ButtonLogic: ", keyValuePar)
 
 			modalMessage = modalCommunicationStruct{
 				modal_ok_clicked: false,
@@ -180,7 +180,7 @@ func (mt *MagicTable) onButtonClick(buttonThatWasClicked int) {
 				keyValueMap:      keyValuePar,
 			}
 
-			fmt.Println("modalMessage before OpenModal", modalMessage)
+			//fmt.Println("modalMessage before OpenModal", modalMessage)
 
 			app.Window().
 				GetElementByID("openModalButton").
@@ -257,7 +257,7 @@ func (mt *MagicTable) GenerateKeyValueMapForMagicTableMetaData() keyValueMapType
 			rowTextBoxValue = mt.GetRowTextBoxValueForEdit(columnDataName)
 		}
 
-		fmt.Println("columnDataName - rowTextBoxValue", columnDataName, rowTextBoxValue)
+		//fmt.Println("columnDataName - rowTextBoxValue", columnDataName, rowTextBoxValue)
 		//rowTextBoxValue ? elem.IsNull()
 
 		keyValuePar[columnDataName] = rowTextBoxValue

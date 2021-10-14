@@ -10,5 +10,5 @@ begin
 end;
 $$;
 
-alter function public.sp_listtablestoedit() owner to testuser;
+alter function public.sp_listtablestoedit() owner to caxdbuser;
 

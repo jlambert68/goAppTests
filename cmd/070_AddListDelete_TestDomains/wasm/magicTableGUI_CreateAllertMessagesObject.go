@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	//"fmt"
 	"github.com/maxence-charriere/go-app/v8/pkg/app"
 )
 
@@ -70,7 +70,7 @@ func (mt *MagicTable) GenerateAlertMessages() ([]app.UI, error) {
 
 		} else {
 			alertMessages = append(alertMessages, alertMessage)
-			fmt.Println("alertMessageToUser.show != true", alertMessageToUser.id, app.Window().GetElementByID(alertMessageToUser.id).Type(), app.Window().GetElementByID(alertMessageToUser.id).IsNull())
+			//fmt.Println("alertMessageToUser.show != true", alertMessageToUser.id, app.Window().GetElementByID(alertMessageToUser.id).Type(), app.Window().GetElementByID(alertMessageToUser.id).IsNull())
 			//app.Window().GetElementByID(alertMessageToUser.id).
 		}
 		//elem := app.Window().

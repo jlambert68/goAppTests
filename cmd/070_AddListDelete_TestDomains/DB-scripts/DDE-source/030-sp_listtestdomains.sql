@@ -18,5 +18,5 @@ begin
 end;
 $$;
 
-alter function public.sp_listtestdomains() owner to testuser;
+alter function public.sp_listtestdomains() owner to caxdbuser;
 

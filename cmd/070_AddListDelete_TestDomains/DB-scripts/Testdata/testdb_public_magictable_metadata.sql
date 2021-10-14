@@ -14,7 +14,7 @@ create table magictable_metadata
 );
 
 alter table magictable_metadata
-    owner to testuser;
+    owner to caxdbuser;
 
 create unique index magictable_metadata_id_uindex
     on magictable_metadata ("Id");

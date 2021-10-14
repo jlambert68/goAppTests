@@ -88,7 +88,7 @@ func (mt *MagicTable) SearchInDB(q string) {
 			return
 		}
 
-		fmt.Println("testDomainInstances ", testDomainInstances)
+		//fmt.Println("testDomainInstances ", testDomainInstances)
 
 		mt.testDataAndMetaData.testDomains = testDomainInstances.TestDomainForListing
 		//fmt.Println("testDomainInstances.TestDomainForListing: ", len(testDomainInstances.TestDomainForListing))

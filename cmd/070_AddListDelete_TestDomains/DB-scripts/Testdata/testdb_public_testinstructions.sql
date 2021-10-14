@@ -13,7 +13,7 @@ create table testinstructions
 );
 
 alter table testinstructions
-    owner to testuser;
+    owner to caxdbuser;
 
 create unique index testinstructions_guid_uindex
     on testinstructions (guid);

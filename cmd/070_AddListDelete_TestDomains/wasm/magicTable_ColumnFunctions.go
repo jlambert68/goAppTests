@@ -1,13 +1,13 @@
 package main
 
 import (
-	"fmt"
+	//"fmt"
 	"github.com/maxence-charriere/go-app/v8/pkg/app"
 	"github.com/sirupsen/logrus"
 	"goAppTest1/cmd/070_AddListDelete_TestDomains/protos/api"
 	"reflect"
 	"sort"
-	"strconv"
+	//"strconv"
 )
 
 func (mt *MagicTable) MyOnColumnClickWrapper(sortOrderThatWasClicked int) app.EventHandler {
@@ -28,15 +28,17 @@ func (mt *MagicTable) MyOnColumnClickWrapper(sortOrderThatWasClicked int) app.Ev
 			return
 		}
 
-		fmt.Println("MyOnColumnClickWrapper is called:::::: " + strconv.Itoa(sortOrderThatWasClicked))
-		fmt.Println("")
-		currentTableDataPointerData := reflect.ValueOf(mt.currentTableDataPointer)
-		numberOfRowsInTable := reflect.Indirect(currentTableDataPointerData).Len()
-		for rowCounter := 1; rowCounter < numberOfRowsInTable+1; rowCounter++ {
-			uniqueId := mt.getUniqueId(rowCounter)
-			fmt.Println("uniqueId", uniqueId)
-		}
-		fmt.Println("mt.columnSortOrderIsAscending before change direction", mt.columnSortOrderIsAscending)
+		//fmt.Println("MyOnColumnClickWrapper is called:::::: " + strconv.Itoa(sortOrderThatWasClicked))
+		//fmt.Println("")
+		//currentTableDataPointerData := reflect.ValueOf(mt.currentTableDataPointer)
+		//numberOfRowsInTable := reflect.Indirect(currentTableDataPointerData).Len()
+		/*
+			for rowCounter := 1; rowCounter < numberOfRowsInTable+1; rowCounter++ {
+				uniqueId := mt.getUniqueId(rowCounter)
+				//fmt.Println("uniqueId", uniqueId)
+			}
+		*/
+		//fmt.Println("mt.columnSortOrderIsAscending before change direction", mt.columnSortOrderIsAscending)
 
 		// Only sort if column is sortable
 		for iColumnCounter, magicTableMetaData := range mt.testDataAndMetaData.magicTableMetaData {
@@ -66,19 +68,19 @@ func (mt *MagicTable) MyOnColumnClickWrapper(sortOrderThatWasClicked int) app.Ev
 					}
 				}
 			}
-			fmt.Println("mt.columnSortOrderIsAscending after change direction", mt.columnSortOrderIsAscending)
+			//fmt.Println("mt.columnSortOrderIsAscending after change direction", mt.columnSortOrderIsAscending)
 
 			// Sort the current data
 			switch mt.tableTypeGuid {
 
 			// Original Test table
 			case "51253aba-41a9-42ef-b5f1-d8d1d7116b47":
-				fmt.Println("sort.SliceStable(mt.testDataAndMetaData.originalTestdataInstances, mt.sliceSorter)")
+				//fmt.Println("sort.SliceStable(mt.testDataAndMetaData.originalTestdataInstances, mt.sliceSorter)")
 				sort.SliceStable(mt.testDataAndMetaData.originalTestdataInstances, mt.sliceSorter)
 
 				// TestDomains
 			case "8acacaaf-676e-4b36-abe6-c5310822ade1":
-				fmt.Println("sort.SliceStable(mt.testDataAndMetaData.testDomains, mt.sliceSorter)")
+				//fmt.Println("sort.SliceStable(mt.testDataAndMetaData.testDomains, mt.sliceSorter)")
 				sort.SliceStable(mt.testDataAndMetaData.testDomains, mt.sliceSorter)
 
 			default:
@@ -98,14 +100,14 @@ func (mt *MagicTable) MyOnColumnClickWrapper(sortOrderThatWasClicked int) app.Ev
 			for rowCounter := 1; rowCounter < numberOfRowsInTable+1; rowCounter++ {
 				uniqueId := mt.getUniqueId(rowCounter)
 
-				fmt.Println("uniqueId", uniqueId)
+				//fmt.Println("uniqueId", uniqueId)
 
 				if uniqueId == mt.uniqueRowSelected {
 					mt.rowSelected = int64(rowCounter)
 
 				}
 			}
-			fmt.Println("mt.columnSortOrderIsAscending after sort", mt.columnSortOrderIsAscending)
+			//fmt.Println("mt.columnSortOrderIsAscending after sort", mt.columnSortOrderIsAscending)
 
 			mt.Update()
 		}
@@ -121,7 +123,7 @@ func (mt *MagicTable) sliceSorter(i, j int) bool {
 	var value2 reflect.Value
 
 	fieldsToExtract := mt.testDataAndMetaData.magicTableMetaData[mt.columnToSortOn].GetColumnDataName()
-	fmt.Println("fieldsToExtract", fieldsToExtract)
+	//fmt.Println("fieldsToExtract", fieldsToExtract)
 
 	switch mt.tableTypeGuid {
 
@@ -145,24 +147,24 @@ func (mt *MagicTable) sliceSorter(i, j int) bool {
 	//value1 := getAttr(reflect.Indirect(currentTableData).Index(i-1), fieldsToExtract)
 	//value2 := getAttr(reflect.Indirect(currentTableData).Index(j-1), fieldsToExtract)
 
-	fmt.Println("mt.testDataAndMetaData.magicTableMetaData[mt.columnToSortOn].ColumnDataType", mt.testDataAndMetaData.magicTableMetaData[mt.columnToSortOn].ColumnDataType)
+	//fmt.Println("mt.testDataAndMetaData.magicTableMetaData[mt.columnToSortOn].ColumnDataType", mt.testDataAndMetaData.magicTableMetaData[mt.columnToSortOn].ColumnDataType)
 
 	switch mt.testDataAndMetaData.magicTableMetaData[mt.columnToSortOn].ColumnDataType {
 	case api.MagicTableColumnDataType_String:
 		compareResult = value1.String() < value2.String()
-		fmt.Println("case api.MagicTableColumnDataType_String:", value1, "<", value2, compareResult)
+		//fmt.Println("case api.MagicTableColumnDataType_String:", value1, "<", value2, compareResult)
 
 	case api.MagicTableColumnDataType_Float:
 		compareResult = value1.Float() < value2.Float()
-		fmt.Println("case api.MagicTableColumnDataType_Float:", value1, "<", value2, compareResult)
+		//fmt.Println("case api.MagicTableColumnDataType_Float:", value1, "<", value2, compareResult)
 
 	case api.MagicTableColumnDataType_Int:
 		compareResult = value1.Int() < value2.Int()
-		fmt.Println("case api.MagicTableColumnDataType_Int:", value1, "<", value2, compareResult)
+		//fmt.Println("case api.MagicTableColumnDataType_Int:", value1, "<", value2, compareResult)
 
 	case api.MagicTableColumnDataType_Bool:
 		compareResult = value1.Bool() == value2.Bool()
-		fmt.Println("case api.MagicTableColumnDataType_Bool:", value1, "<", value2, compareResult)
+		//fmt.Println("case api.MagicTableColumnDataType_Bool:", value1, "<", value2, compareResult)
 
 	default:
 		mt.logger.WithFields(logrus.Fields{
@@ -172,7 +174,7 @@ func (mt *MagicTable) sliceSorter(i, j int) bool {
 	}
 
 	xnorResults := xor(mt.columnSortOrderIsAscending, compareResult)
-	fmt.Println("value1, value2, mt.columnSortOrderIsAscending, compareResult, xnorResults:: ", value1, value2, mt.columnSortOrderIsAscending, compareResult, xnorResults)
+	//fmt.Println("value1, value2, mt.columnSortOrderIsAscending, compareResult, xnorResults:: ", value1, value2, mt.columnSortOrderIsAscending, compareResult, xnorResults)
 
 	return xnorResults
 }
@@ -194,6 +196,7 @@ func getAttr(obj interface{}, fieldName string) reflect.Value {
 
 // XNOR function
 func xor(a, b bool) bool {
+
 	return ((a && b) || (!a && !b)) //XNOR
 	//return ((a || b) && (!a || !b)) //XOR
 	//return ((a && b) || (!a && b))

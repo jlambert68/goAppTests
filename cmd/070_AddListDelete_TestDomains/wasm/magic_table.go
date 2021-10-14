@@ -243,7 +243,7 @@ func (mt *MagicTable) removeIndexFromMagicTable(s []alertMessageStruct, index in
 
 func (mt *MagicTable) GetRowTextBoxValueForEdit(columnDataName string) string {
 
-	fmt.Println("GetRowTextBoxValueForEdit(columnDataName string) string {", columnDataName)
+	//fmt.Println("GetRowTextBoxValueForEdit(columnDataName string) string {", columnDataName)
 
 	var returnValue string
 
@@ -272,7 +272,7 @@ func (mt *MagicTable) GetRowTextBoxValueForEdit(columnDataName string) string {
 		f := reflect.Indirect(rowData).FieldByName(columnDataName)
 
 		returnValue = fmt.Sprintf("%v", f)
-		fmt.Println("columnDataName, returnValue", columnDataName, returnValue)
+		//fmt.Println("columnDataName, returnValue", columnDataName, returnValue)
 
 	default:
 		returnValue = ""

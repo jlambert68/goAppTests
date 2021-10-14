@@ -109,7 +109,7 @@ func (mt *MagicTable) onModalOKClicked() app.EventHandler {
 			//fmt.Println("modalMessage case TableState_Delete_Save", modalMessage)
 
 			//keyValuePar = mt.GenerateKeyValueMapForMagicTableMetaData()
-			fmt.Println("keyValuePar: ", modalMessage.keyValueMap)
+			//fmt.Println("keyValuePar: ", modalMessage.keyValueMap)
 			mt.DeleteTestDomain(modalMessage.keyValueMap)
 			modalMessage.modal_ok_clicked = true
 
