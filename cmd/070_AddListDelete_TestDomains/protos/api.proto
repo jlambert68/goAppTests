@@ -4,32 +4,40 @@ package api;
 
 option go_package = "cmd/070_AddListDelete_TestDomains/protos/api";
 
-message Instance {
-  int64 UniqueId = 1;
-  string name = 2;
-  string instance_type = 3;
-  float ecu = 4;
-  float memory = 5;
-  string network = 6;
-  string  price = 7;
 
-}
-
-message Instances {
-  repeated Instance instances = 1;
-}
-
-message SearchRequest {
-  string query = 1;
-}
-
-message TimeMessage {
-  string timeString = 1;
-}
-
+// ********** Common messages section **********
 message EmptyParameter {
 }
 
+message AckNacResponse {
+  bool AckNack = 1;
+  string Message = 2;
+}
+
+
+
+
+// ********** gRPC service **********
+service Api {
+  rpc Search (SearchRequest) returns (Instances);
+  rpc GetTime (EmptyParameter) returns (TimeMessage);
+
+  rpc GetMagicTableMetadata(MagicTableMetadataRequest) returns (MagicTableMetadataRespons);
+
+  rpc ListTestDomains(EmptyParameter) returns (ListTestDomainsRespons);
+  rpc SaveNewOrUpdateTestDomain(NewOrUpdateTestDomainRequest) returns (NewOrUpdateTestDomainResponse);
+  rpc DeleteTestDomain(DeleteTestDomainRequest) returns (DeleteTestDomainResponse);
+
+  rpc ListTestInstructions(EmptyParameter) returns (ListTestInstructionsRespons);
+  rpc SaveNewOrUpdateTestInstruction(NewOrUpdateTestInstructionRequest) returns (NewOrUpdateTestInstructionResponse);
+
+  rpc ListTablesToEdit(EmptyParameter) returns (ListTablesToEditRespons);
+
+  // Send Testdata to central Fenix server- PoC Fenix 2
+  rpc SendAllTestDataSets(SendAllTestDataSetsRequest) returns (AckNacResponse);
+}
+
+// ********** Metadata section **********
 message MagicTableMetadataRequest {
   MagicTableType MagicTableMetadataType = 1;
   string TableTypeGuid = 2;
@@ -46,7 +54,7 @@ message MagicTableColumnMetadata {
   MagicTableColumnDataType ColumnDataType = 3;
   bool Sortable = 4;
   MagicTableColumnPresentationType FormatPresentationType = 5;
-  bool ShouldBeVisible  = 6;
+  bool ShouldBeVisible = 6;
   int64 PresentationOrder = 7;
   bool UpdateIsEditable = 8;
   bool NewIsEditable = 9;
@@ -73,27 +81,7 @@ enum MagicTableColumnPresentationType {
 
 
 
-
-
-service Api {
-  rpc Search (SearchRequest) returns (Instances);
-  rpc GetTime (EmptyParameter) returns (TimeMessage);
-
-  rpc GetMagicTableMetadata(MagicTableMetadataRequest) returns (MagicTableMetadataRespons);
-
-  rpc ListTestDomains(EmptyParameter) returns (ListTestDomainsRespons);
-  rpc SaveNewOrUpdateTestDomain(NewOrUpdateTestDomainRequest) returns (NewOrUpdateTestDomainResponse);
-  rpc DeleteTestDomain(DeleteTestDomainRequest) returns (DeleteTestDomainResponse);
-
-  rpc ListTestInstructions(EmptyParameter) returns (ListTestInstructionsRespons);
-  rpc SaveNewOrUpdateTestInstruction(NewOrUpdateTestInstructionRequest) returns (NewOrUpdateTestInstructionResponse);
-
-
-  rpc ListTablesToEdit(EmptyParameter) returns (ListTablesToEditRespons);
-}
-
-// TestDomains section
-
+// ********** TestDomains section **********
 message testDomainForListingMessage {
   int32 Id = 1;
   string Guid = 2;
@@ -163,7 +151,7 @@ message DeleteTestDomainData {
   int32 Domain_version = 10;
 }
 
-// TestInstructions section
+// ********** TestInstructions section **********
 
 message ListTestInstructionRespons {
   int32 Id = 1;
@@ -211,7 +199,7 @@ message NewOrUpdateTestInstructionResponse {
   string ResponseMessage = 4;
 }
 
-// ListTableToEdit
+// ********** ListTableToEdit section **********
 message ListTableToEdit {
   int32 Id = 1;
   string Guid = 2;
@@ -222,6 +210,171 @@ message ListTablesToEditRespons {
   repeated  ListTableToEdit MyListTableToEdit = 1;
 }
 
+// ********** Original data section **********
+
+message Instance {
+  int64 UniqueId = 1;
+  string name = 2;
+  string instance_type = 3;
+  float ecu = 4;
+  float memory = 5;
+  string network = 6;
+  string  price = 7;
+
+}
+
+message Instances {
+  repeated Instance instances = 1;
+}
+
+message SearchRequest {
+  string query = 1;
+}
+
+// ********** Get time section **********
+
+message TimeMessage {
+  string timeString = 1;
+}
+
+
+// ********** SendAllTestDataSets section **********
+message SendAllTestDataSetsRequest {
+  string SendingSystemGuid = 1;
+  string TestDataExportedTimeStamp = 2;
+  string HeaderCreatedTimeStamp = 3;
+  string TestDataHash = 4;
+  string HeaderStructureHash = 5;
+  Header Header = 6;
+  repeated TestDataSetRow TestDataSetRows = 7;
+
+}
+
+message TestDataSetRow {
+  string TestDataRowHash = 1;
+      repeated TestDataSetValue TestDataSetValues = 2;
+}
+
+message TestDataSetValue {
+  int32 HeaderId = 1;
+  string StringRepresentation = 2;
+}
+
+message Header  {
+  repeated HeaderColumn HeaderColumns = 1;
+}
+
+message HeaderColumn {
+  int32 HeaderId = 1;
+  string HeaderName = 2;
+  string HeaderMouseOverDescription = 3;
+  bool UseAsFilter = 4;
+  bool VisibleInListings = 5;
+  repeated string ValuesForFilter = 6;
+}
+
+// ********** GeneralObject section **********
+
+message GeneralObjectListingResponse {
+  repeated GeneralObjectListingMessage GeneralObjectListingMessages = 1;
+}
+
+message GeneralObjectListingMessage {
+  int32 Db_Id = 1;
+  int32 GeneralObject_id = 2;
+  int32 GeneralObject_version = 3;
+  string GeneralObjectType_Guid = 4;
+  string GeneralObject_Guid = 5;
+  string GeneralObject_Name = 6;
+  string GeneralObject_Description = 7;
+  bool GeneralObject_ReadyForUse = 8;
+  bool GeneralObject_Activated = 9;
+  bool GeneralObject_Deleted = 10;
+  string GeneralObject_UpdateTimestamp = 11;
+}
+
+message GeneralObjectType {
+  int32 Db_Id = 1;
+  int32 GeneralObjectType_id = 2;
+  int32 GeneralObjectType_version = 3;
+  string GeneralObjectType_Guid = 5;
+  string GeneralObjectType_Name = 6;
+  string GeneralObjectType_Description = 7;
+  bool GeneralObjectType_ReadyForUse = 8;
+  bool GeneralObjectType_Activated = 9; //TODO Ska denna verkligen användas
+  bool GeneralObjectType_Deleted = 10;
+  string GeneralObjectType_UpdateTimestamp = 11;
+}
 
 
 
+
+
+message testDomainForListingMessage {
+  int32 Id = 1;
+  string Guid = 2;
+  string Name = 3;
+  string Description = 4;
+  bool ReadyForUse = 5;
+  bool Activated = 6;
+  bool Deleted = 7;
+  string UpdateTimestamp = 8;
+  int64 UniqueId = 9;
+  int32 Domain_id = 10;
+  int32 Domain_version = 11;
+}
+
+message ListTestDomainsRespons {
+  repeated  testDomainForListingMessage testDomainForListing = 1;
+}
+
+
+message NewOrUpdateTestDomainRequest {
+  NewOrUpdateTestDomainUpdateType NewOrUpdate = 1;
+  NewOrUpdateTestDomainData NewOrUpdateTestDomainData = 2;
+}
+
+message NewOrUpdateTestDomainData {
+  int32 Id = 1;
+  string Guid = 2;
+  string Name = 3;
+  string Description = 4;
+  bool ReadyForUse = 5;
+  bool Activated = 6;
+  bool Deleted = 7;
+  string UpdateTimestamp = 8;
+}
+
+enum NewOrUpdateTestDomainUpdateType {
+  NewTestDomain = 0;
+  UpdateTestDomain = 1;
+}
+
+message NewOrUpdateTestDomainResponse {
+  NewOrUpdateTestDomainData NewOrUpdateTestDomainData = 1;
+  bool ResponseStatus = 2;
+  string ResponseMessage = 3;
+}
+
+message DeleteTestDomainRequest {
+  string Guid = 1;
+}
+
+message DeleteTestDomainResponse {
+  DeleteTestDomainData DeleteTestDomainData = 1;
+  bool ResponseStatus = 2;
+  string ResponseMessage = 3;
+}
+
+message DeleteTestDomainData {
+  int32 Id = 1;
+  string Guid = 2;
+  string Name = 3;
+  string Description = 4;
+  bool ReadyForUse = 5;
+  bool Activated = 6;
+  bool Deleted = 7;
+  string UpdateTimestamp = 8;
+  int32 Domain_id = 9;
+  int32 Domain_version = 10;
+}
